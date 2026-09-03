@@ -1,4 +1,6 @@
 # Срабатывает на pull request в main и в main-task-* (не в студенческую ветку как base).
+# Тип edited нужен, чтобы при смене base (main → main-task-0) Checks запустились снова.
+# Правка только заголовка PR не гоняет тесты (фильтр на job).
 # Шаги:
 # - если base не main-task-*: комментарий в PR и красный Check;
 # - flake8: сборка падает только на синтаксисе и неопределённых именах;
@@ -21,6 +23,11 @@ on:
     branches:
       - main
       - "main-task-*"
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
 
 permissions:
   contents: read
@@ -28,6 +35,7 @@ permissions:
 
 jobs:
   test:
+    if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
