@@ -39,13 +39,12 @@ def fibonacci(n: int) -> int:
     :param n: Порядковый номер числа Фибоначчи
     :return: число Фибоначчи
     """
-    if n < 2:
-        return n
+    fib_pair = (0, 1)
 
-    f_num1, f_num2 = 0, 1
-    for _ in range(2, n + 1):
-        f_num1, f_num2 = f_num2, f_num1 + f_num2
-    return f_num2
+    for _ in range(n):
+        fib_pair = fib_pair[1], fib_pair[0] + fib_pair[1]
+
+    return fib_pair[0]
 
 
 def main():
