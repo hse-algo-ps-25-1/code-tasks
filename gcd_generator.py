@@ -1,5 +1,3 @@
-import random
-
 COMMON_FACTORS = 0
 A_ONLY_FACTORS = 1
 B_ONLY_FACTORS = 2
