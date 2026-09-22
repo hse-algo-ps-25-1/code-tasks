@@ -20,7 +20,15 @@ def gcd_iterative_slow(a: int, b: int) -> int:
     :param b: целое число b
     :return: значение наибольшего общего делителя
     """
-    pass
+    a, b = abs(a), abs(b)
+    if a == 0 or b == 0:
+        return a or b
+    while a != b:
+        if a > b:
+            a -= b
+        else:
+            b -= a
+    return a
 
 
 def gcd_iterative_fast(a: int, b: int) -> int:
