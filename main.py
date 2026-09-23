@@ -9,7 +9,14 @@ def gcd_recursive(a: int, b: int) -> int:
     :param b: целое число b
     :return: значение наибольшего общего делителя
     """
-    pass
+    a, b = abs(a), abs(b)
+    if a == 0:
+        return b
+    if b == 0:
+        return a
+    if a < b:
+        a, b = b, a
+    return gcd_recursive(a % b, b)
 
 
 def gcd_iterative_slow(a: int, b: int) -> int:
@@ -20,7 +27,14 @@ def gcd_iterative_slow(a: int, b: int) -> int:
     :param b: целое число b
     :return: значение наибольшего общего делителя
     """
-    pass
+    a, b = abs(a), abs(b)
+    while a != b and a != 0 and b != 0:
+        if a < b:
+            a, b = b, a
+        a -= b
+    if a == 0:
+        return b
+    return a
 
 
 def gcd_iterative_fast(a: int, b: int) -> int:
@@ -31,7 +45,14 @@ def gcd_iterative_fast(a: int, b: int) -> int:
     :param b: целое число b
     :return: значение наибольшего общего делителя
     """
-    pass
+    a, b = abs(a), abs(b)
+    while a != 0 and b != 0:
+        if a < b:
+            a, b = b, a
+        a %= b
+    if a == 0:
+        return b
+    return a
 
 
 def lcm(a: int, b: int) -> int:
@@ -41,7 +62,11 @@ def lcm(a: int, b: int) -> int:
     :param b: натуральное число b
     :return: значение наименьшего общего кратного
     """
-    pass
+    divisor = gcd_iterative_fast(a, b)
+    if divisor == 0:
+        return 0
+    # НОД делит a, поэтому сначала сокращаем a, потом умножаем на b.
+    return abs(a) // divisor * abs(b)
 
 
 def main():
