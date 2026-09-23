@@ -8,7 +8,9 @@ def fibonacci_rec(n: int) -> int:
     :param n: порядковый номер числа Фибоначчи
     :return: число Фибоначчи
     """
-    pass
+    if n in (1, 2):  # выход из рекурсии, если последовательность начинается с 1
+        return 1
+    return fibonacci_rec(n - 1) + fibonacci_rec(n - 2)
 
 
 def fibonacci_iter(n: int) -> int:
@@ -18,7 +20,12 @@ def fibonacci_iter(n: int) -> int:
     :param n: порядковый номер числа Фибоначчи
     :return: число Фибоначчи
     """
-    pass
+    if n in (1, 2):  # базовый случай, если последовательность начинается с 1
+        return 1
+    numbers = [1] * n  # список из n единиц
+    for i in range(2, n):
+        numbers[i] = numbers[i - 1] + numbers[i - 2]
+    return numbers[-1]
 
 
 def fibonacci(n: int) -> int:
@@ -26,10 +33,20 @@ def fibonacci(n: int) -> int:
 
     :param n: порядковый номер числа Фибоначчи
     :return: число Фибоначчи
+
+    храним только два числа:
+    curr - текущее число последовательности,
+    prev - предыдущее число последовательности
     """
-    pass
+    if n in (1, 2):  # базовый случай, если последовательность начинается с 1
+        return 1
+    curr = prev = 1
+    for _ in range(n - 2):  # n-2, т.к. уже 2 числа известны
+        curr, prev = curr + prev, curr
+    return curr
 
 
+@profile()
 def main():
     n = 35
     print(f"Вычисление {n} числа Фибоначчи рекурсивно:")
