@@ -3,7 +3,7 @@
 # Правка только заголовка PR не гоняет тесты (фильтр на job).
 # Шаги:
 # - если base не main-task-*: комментарий в PR и красный Check;
-# - flake8: сборка падает только на синтаксисе и неопределённых именах;
+# - ruff: сборка падает только на синтаксисе и неопределённых именах;
 #   замечания по стилю не валят Checks (--exit-zero), их смотрят на ревью;
 # - unittest: если есть test_runner.py — он, иначе поиск test*.py по дереву репозитория;
 # - лимит 5 минут.
@@ -97,10 +97,10 @@ jobs:
         python-version: "3.14"
     - name: Install dependencies
       run: python -m pip install -r requirements.txt
-    - name: Lint with flake8
+    - name: Lint with ruff
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude .venv
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics --exclude .venv
+        ruff check . --select E9,F63,F7,F82
+        ruff check . --exit-zero
     - name: Test with unittest module
       run: |
         if [ -f test_runner.py ]; then
