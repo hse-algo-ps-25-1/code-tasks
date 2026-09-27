@@ -31,10 +31,10 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
 
         determinant = 0
         for col_idx in range(matrix_order):
-            minor = [
-                [matrix[elem][row] for row in range(matrix_order) if row != col_idx]
+            minor = tuple(
+                tuple(matrix[elem][row] for row in range(matrix_order) if row != col_idx)
                 for elem in range(1, matrix_order)
-            ]
+            )
 
             sign = 1 if col_idx % 2 == 0 else -1
             determinant += sign * matrix[0][col_idx] * determinant_recursive(minor)

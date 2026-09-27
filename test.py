@@ -86,5 +86,7 @@ class TestDeterminant(unittest.TestCase):
             [0,0]
         ]
         self.assertEqual(calculate_determinant(matrix),0)
+    #TODO: добавить матрицу высокого порядка, чтобы убедиться,
+    #  что программа не сдохнет от большой нагрузки
 if __name__ == "__main__":
     unittest.main()
