@@ -5,9 +5,48 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
     :raises Exception: если matrix не является такой матрицей
     :return: значение определителя
     """
-    pass
+
+    def valid_matrix(matrix):
+        if not matrix or not matrix[0]:
+            return False
+        for row in matrix:
+            if len(row) != len(matrix):
+                return False
+            for val in row:
+                if type(val) is int:
+                    continue
+                if type(val) is float and val.is_integer():
+                    continue
+                return False
+        return True
+
+    def determinant_recursive(matrix):
+        matrix_order = len(matrix)
+
+        if matrix_order == 1:
+            return matrix[0][0]
+        if matrix_order == 2:
+            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
+        determinant = 0
+        for col_idx in range(matrix_order):
+            minor = [
+                [matrix[elem][row] for row in range(matrix_order) if row != col_idx]
+                for elem in range(1, matrix_order)
+            ]
+
+            sign = 1 if col_idx % 2 == 0 else -1
+            determinant += sign * matrix[0][col_idx] * determinant_recursive(minor)
+
+        return determinant
+
+    if not valid_matrix(matrix):
+        raise Exception("Ошибка: неверный формат матрицы")
+
+    return determinant_recursive(matrix)
 
 
+# TODO: Разобраться с тестами: добавить новых, продумать крайние случаи
 def main():
     matrix = [[1, 2], [3, 4]]
     print("Матрица")
