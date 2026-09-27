@@ -13,11 +13,8 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
             if len(row) != len(matrix):
                 return False
             for val in row:
-                if type(val) is int:
-                    continue
-                if type(val) is float and val.is_integer():
-                    continue
-                return False
+                if not val.is_integer():
+                    return False
         return True
 
     def determinant_recursive(matrix):
