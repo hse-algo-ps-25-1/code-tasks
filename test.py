@@ -64,6 +64,27 @@ class TestDeterminant(unittest.TestCase):
                     calculate_determinant(test_case.matrix), test_case.det
                 )
 
+    def test_float_matrix(self):
+        """Проверяет выброс исключения при наличии дробного числа в матрице"""
+        matrix = [
+            [1,2,3],
+            [4,42.21,6],
+            [7,8,9]]
+        self.assertRaises(Exception, calculate_determinant, matrix)
 
+    def test_int_float_numbers(self):
+        """Проверяет корректность работы функции с целыми числами записанными как float"""
+        matrix = [
+            [1,2.0],
+            [3.0,4]]
+        self.assertEqual(calculate_determinant(matrix),-2)
+
+    def zero_matrix(self):
+        """Проверяет работу функции с нулевой матрицей"""
+        matrix = [
+            [0,0],
+            [0,0]
+        ]
+        self.assertEqual(calculate_determinant(matrix),0)
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,6 @@
+from functools import cache
+
+
 def calculate_determinant(matrix: list[list[int]]) -> int:
     """Вычисляет определитель разложением по строке.
 
@@ -17,6 +20,7 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
                     return False
         return True
 
+    @cache
     def determinant_recursive(matrix):
         matrix_order = len(matrix)
 
@@ -39,11 +43,11 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
 
     if not valid_matrix(matrix):
         raise Exception("Ошибка: неверный формат матрицы")
+    # конвертация в кортежи для оптимизации расходов памяти и добавления возможности кэширования
+    matrix = tuple(tuple(row) for row in matrix)
+    return int(determinant_recursive(matrix))
 
-    return determinant_recursive(matrix)
 
-
-# TODO: Разобраться с тестами: добавить новых, продумать крайние случаи
 def main():
     matrix = [[1, 2], [3, 4]]
     print("Матрица")
