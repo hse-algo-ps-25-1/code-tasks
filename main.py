@@ -7,7 +7,42 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     :raises Exception: если matrix не является такой матрицей
     :return: значение определителя
     """
-    pass
+    n = len(matrix)
+    if n == 0:
+        raise Exception("Матрица должна быть квадратной")
+
+    for row in matrix:
+        if len(row) != n:
+            raise Exception("Матрица должна быть квадратной")
+
+    if n == 1:
+        return matrix[0][0]
+
+    a = matrix[0][0]
+    b = matrix[0][1]
+    c = matrix[1][0]
+    for row in range(n):
+        if (
+            matrix[row][row] != a
+            or (row < n - 1 and matrix[row][row + 1] != b)
+            or (row > 0 and matrix[row][row - 1] != c)
+        ):
+            raise Exception(
+                "Матрица должна быть с постоянными значениями на диагоналях"
+            )
+        for col in range(n):
+            if abs(row - col) > 1 and matrix[row][col] != 0:
+                raise Exception("Остальные элементы матрицы должны быть равны нулю")
+
+    # X_(n) = a * X_(n - 1) - b * c * X_(n - 2)
+    prev2 = 1  # X_(0)
+    prev1 = a  # X_(1)
+    for _ in range(2, n + 1):
+        current = a * prev1 - b * c * prev2
+        prev2 = prev1
+        prev1 = current
+
+    return prev1
 
 
 def main():
