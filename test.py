@@ -50,13 +50,13 @@ class TestTridiagonalDeterminant(unittest.TestCase):
     def test_not_same_number_in_lower_diagonal(self):
         """Проверяет, что функция выбрасывает исключение при передаче
         матрицы, с непостоянными числами в поддиагонали"""
-        matrix = [[2, -3, 0, 0], [5, 2, 1, 0], [0, 5, 2, -3], [0, 0, 1, 2]]
+        matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 1, 2]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
-    def test_empty_columns_in_matrix(self):
+    def test_empty_rows_in_matrix(self):
         """Проверяет, что функция выбрасывает исключение при передаче
         матрицы, с пустыми вложенными списками"""
-        matrix = [[None, None], [None, None]]
+        matrix = [[], []]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_null_upper_diagonal(self):
@@ -103,7 +103,7 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         self.assertEqual(get_tridiagonal_determinant(matrix), -19575)
 
     def test_seventh_order(self):
-        """Проверяет расчет определителя для матрицы порядка 5"""
+        """Проверяет расчет определителя для матрицы порядка 7"""
         matrix = [
             [9, 8, 0, 0, 0, 0, 0],
             [7, 9, 8, 0, 0, 0, 0],

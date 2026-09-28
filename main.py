@@ -9,36 +9,36 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     """
 
     validate(matrix)
-    a, b, c, n = get_values(matrix)
+    a, b, c = get_values(matrix)
+    n = len(matrix)
 
     return __get_tridiagonal_determinant(a, b, c, n)
 
 
 def get_values(matrix):
-    n = len(matrix)
-
     a = matrix[0][0]
     b = 0
     c = 0
-    if n > 1:
+    if len(matrix) > 1:
         b = matrix[0][1]
         c = matrix[1][0]
 
-    return (a, b, c, n)
+    return (a, b, c)
 
 
 def validate(matrix):
     if not isinstance(matrix, list):
         raise Exception("Неправильный тип матрицы!")
 
-    if len(matrix) < 1:
+    n = len(matrix)
+    if n < 1:
         raise Exception("Неправильный порядок матрицы!")
-
-    a, b, c, n = get_values(matrix)
 
     for row in matrix:
         if len(row) != n:
             raise Exception("Матрица не квадратная!")
+
+    a, b, c = get_values(matrix)
 
     if n > 1:
         # В трёхдиагональной матрице элементы в наддиагонали и поддиагонали
@@ -80,7 +80,9 @@ def __get_tridiagonal_determinant(a, b, c, n):
     if n == 2:
         return a**2 - b * c
 
-    return a * __get_tridiagonal_determinant(a, b, c, n - 1) - b * c * __get_tridiagonal_determinant(a, b, c, n - 2)
+    return a * __get_tridiagonal_determinant(
+        a, b, c, n - 1
+    ) - b * c * __get_tridiagonal_determinant(a, b, c, n - 2)
 
 
 def main():
