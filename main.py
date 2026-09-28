@@ -10,7 +10,7 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
     """
 
     def valid_matrix(matrix):
-        if not matrix or not matrix[0]:
+        if not matrix:
             return False
         for row in matrix:
             if len(row) != len(matrix):

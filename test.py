@@ -79,14 +79,35 @@ class TestDeterminant(unittest.TestCase):
             [3.0,4]]
         self.assertEqual(calculate_determinant(matrix),-2)
 
-    def zero_matrix(self):
+    def test_zero_matrix(self):
         """Проверяет работу функции с нулевой матрицей"""
         matrix = [
             [0,0],
             [0,0]
         ]
         self.assertEqual(calculate_determinant(matrix),0)
-    #TODO: добавить матрицу высокого порядка, чтобы убедиться,
-    #  что программа не сдохнет от большой нагрузки
+
+    def test_double_empty_matrix(self):
+        """Проверка исключения при пустой матрице с пустой строкой"""
+        matrix = [[]]
+        self.assertRaises(Exception, calculate_determinant, matrix)
+
+    def test_large_matrix(self):
+        """Проверка работы при бОльших числах и более высоком порядке матрицы"""
+        matrix = [
+    [45, 12, 78, 34, 91, 23, 67, 89, 56, 11],
+    [23, 89, 45, 67, 12, 34, 78, 91, 23, 56],
+    [67, 34, 91, 12, 45, 78, 23, 56, 89, 11],
+    [89, 56, 23, 78, 34, 11, 45, 12, 67, 91],
+    [12, 78, 56, 91, 23, 67, 34, 45, 11, 89],
+    [34, 45, 11, 23, 78, 89, 91, 67, 12, 56],
+    [91, 67, 34, 56, 11, 45, 12, 78, 89, 23],
+    [56, 23, 89, 45, 67, 12, 78, 34, 91, 11],
+    [78, 11, 67, 89, 56, 91, 23, 12, 34, 45],
+    [11, 91, 12, 34, 89, 56, 45, 23, 78, 67]
+    ]
+        self.assertEqual(calculate_determinant(matrix),-3250678692676237890)
+
+
 if __name__ == "__main__":
     unittest.main()
