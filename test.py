@@ -49,6 +49,29 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 5, 2]]
         self.assertEqual(get_tridiagonal_determinant(matrix), 421)
 
+    def test_main_diagonal_must_be_constant(self):
+        matrix = [[1, 2, 0], [3, 4, 2], [0, 3, 1]]
+        with self.assertRaises(ValueError):
+            get_tridiagonal_determinant(matrix)
+
+    def test_upper_diagonal_must_be_constant(self):
+        matrix = [[1, 2, 0], [3, 1, 4], [0, 3, 1]]
+        with self.assertRaises(ValueError):
+            get_tridiagonal_determinant(matrix)
+
+    def test_lower_diagonal_must_be_constant(self):
+        matrix = [[1, 2, 0], [3, 1, 2], [0, 4, 1]]
+        with self.assertRaises(ValueError):
+            get_tridiagonal_determinant(matrix)
+
+    def test_non_integer_element(self):
+        with self.assertRaises(TypeError):
+            get_tridiagonal_determinant([[1.5]])
+
+    def test_zero_diagonal_values(self):
+        matrix = [[0, 2, 0], [3, 0, 2], [0, 3, 0]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
