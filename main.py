@@ -26,7 +26,28 @@ def _get_two_determinants(size: int, a: int, bc: int) -> tuple[int, int]:
 
 
 def _validate(matrix: list[list[int]]) -> None:
-    pass
+    if matrix is None:
+        raise Exception("Объект не является матрицей!")
+
+    n = len(matrix)
+    if n == 0:
+        raise Exception("Матрица пустая!")
+
+    for i, row in enumerate(matrix):
+        if not isinstance(row, list):
+            raise Exception("Строка не является списком!")
+
+        if len(row) != n:
+            raise Exception("Матрица не квадратная!")
+
+        for j, val in enumerate(row):
+            if not isinstance(val, int) or isinstance(val, bool):
+                raise Exception("Элементы матрицы имеют тип отличный от int!")
+
+    for i in range(n):
+        for j in range(n):
+            if abs(i - j) > 1 and matrix[i][j] != 0:
+                raise Exception("Матрица не является трёхдиагональной!")
 
 
 def main():
