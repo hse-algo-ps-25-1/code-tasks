@@ -52,6 +52,23 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         ]
         self.assertEqual(get_tridiagonal_determinant(matrix), 6)
 
+    def test_non_tridiag_nonzero_diagonal(self):
+        matrix = [
+            [2, 3, 0, 9],
+            [1, 4, 5, 0],
+            [0, 2, 6, 7],
+            [0, 0, 3, 8],
+        ]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_string_value_raises(self):
+        matrix = [
+            ["1", 2, 0],
+            [3, 4, 5],
+            [0, 6, 7],
+        ]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
 
 if __name__ == "__main__":
     unittest.main()
