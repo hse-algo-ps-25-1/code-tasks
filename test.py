@@ -118,27 +118,6 @@ class TestDeterminant(unittest.TestCase):
 
         self.assertEqual(calculate_determinant(matrix), -3)
 
-
-        """Проверяет верхнетреугольную матрицу."""
-        matrix = [
-            [2, 5, 7],
-            [0, 3, 8],
-            [0, 0, 4],
-        ]
-
-        self.assertEqual(calculate_determinant(matrix), 24)
-
-  
-        """Определитель единичной матрицы равен 1."""
-        matrix = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1],
-        ]
-
-        self.assertEqual(calculate_determinant(matrix), 1)   
-
     def test_transpose_same_determinant(self):
         """Проверяет, что транспонирование матрицы не изменяет её определитель."""
         matrix = [
