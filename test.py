@@ -67,9 +67,9 @@ class TestDeterminant(unittest.TestCase):
     def test_float_matrix(self):
         """Проверяет выброс исключения при наличии дробного числа в матрице"""
         matrix = [
-            [1,2,3],
-            [4,42.21,6],
-            [7,8,9]]
+            [1, 2, 3],
+            [4, 42.21, 6],
+            [7, 8, 9]]
         self.assertRaises(Exception, calculate_determinant, matrix)
 
     def test_int_float_numbers(self):
@@ -108,6 +108,103 @@ class TestDeterminant(unittest.TestCase):
     ]
         self.assertEqual(calculate_determinant(matrix),-3250678692676237890)
 
+    def test_minor_building(self):
+        """Проверяет правильность построения миноров."""
+        matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 10],
+        ]
+
+        self.assertEqual(calculate_determinant(matrix), -3)
+
+
+        """Проверяет верхнетреугольную матрицу."""
+        matrix = [
+            [2, 5, 7],
+            [0, 3, 8],
+            [0, 0, 4],
+        ]
+
+        self.assertEqual(calculate_determinant(matrix), 24)
+
+  
+        """Определитель единичной матрицы равен 1."""
+        matrix = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+        ]
+
+        self.assertEqual(calculate_determinant(matrix), 1)   
+
+    def test_transpose_same_determinant(self):
+        """Проверяет, что транспонирование матрицы не изменяет её определитель."""
+        matrix = [
+            [2, -1, 3],
+            [4, 5, 0],
+            [7, 2, 6],
+        ]
+
+        transposed = [
+            [2, 4, 7],
+            [-1, 5, 2],
+            [3, 0, 6],
+        ]
+
+        self.assertEqual(
+            calculate_determinant(matrix),
+            calculate_determinant(transposed),
+        )
+
+    def test_ragged_matrix(self):
+        """Проверяет выброс исключения для матрицы со строками разной длины."""
+        matrix = [
+            [1, 2, 3],
+            [4, 5],
+            [6, 7, 8],
+        ]
+
+        self.assertRaises(Exception, calculate_determinant, matrix)
+
+
+    def test_ragged_columns(self):
+        """Проверяет выброс исключения для матрицы с неполными столбцами."""
+        matrix = [
+            [1],
+            [2, 3],
+            [4, 5, 6],
+        ]
+
+        self.assertRaises(Exception, calculate_determinant, matrix)
+
+    def test_different_column_lengths(self):
+        """Проверяет выброс исключения для матрицы со столбцами разной длины."""
+        matrix = [
+            [1, 2, 3, 4],
+            [5, 6],
+            [7, 8, 9],
+        ]
+
+        self.assertRaises(Exception, calculate_determinant, matrix)  
+          
+    def test_bool_matrix(self):
+        """Проверяет, что функция выбрасывает исключение при наличии логических значений в матрице."""
+        matrices = [
+            [
+                [1, True],
+                [3, 4],
+            ],
+            [
+                [1, 2],
+                [False, 4],
+            ],
+        ]
+
+        for matrix in matrices:
+            with self.subTest(matrix=matrix):
+                self.assertRaises(Exception, calculate_determinant, matrix)
 
 if __name__ == "__main__":
     unittest.main()
