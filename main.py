@@ -1,12 +1,31 @@
 def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
-    """Рекурсивное вычисление определителя трёхдиагональной матрицы разложением.
+    """Вычисляет определитель трёхдиагональной матрицы."""
+    _validate(matrix)
 
-    :param matrix: квадратная целочисленная трёхдиагональная матрица
-        порядка не меньше 1 с постоянными значениями на каждой
-        из трёх диагоналей
-    :raises Exception: если matrix не является такой матрицей
-    :return: значение определителя
-    """
+    size = len(matrix)
+    a = matrix[0][0]
+
+    if size == 1:
+        return a
+
+    b = matrix[0][1]
+    c = matrix[1][0]
+
+    determinant, _ = _get_two_determinants(size, a, b * c)
+    return determinant
+
+
+def _get_two_determinants(size: int, a: int, bc: int) -> tuple[int, int]:
+    if size == 1:
+        return a, 1
+
+    previous, before_previous = _get_two_determinants(size - 1, a, bc)
+    current = a * previous - bc * before_previous
+
+    return current, previous
+
+
+def _validate(matrix: list[list[int]]) -> None:
     pass
 
 
