@@ -36,7 +36,8 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_invalid_row_type(self):
-        """Проверяет, что все строки являются списками."""
+        """Проверяет, что функция выбрасывает исключение,
+        если не все строки являются списками."""
         cases = [
             ("none", [None]),
             ("integer", [1]),
@@ -52,32 +53,33 @@ class TestTridiagonalDeterminant(unittest.TestCase):
                 self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_invalid_element_type(self):
-        """Проверяет, что нет нецелочисленных элементов и логических значений."""
+        """Проверяет, что функция выбрасывает исключение,
+        если любой из элементов нецелочисленного или логического значения."""
         for value in (None, "1", 1.0, True, False):
             with self.subTest(value=value):
                 self.assertRaises(Exception, get_tridiagonal_determinant, [[value]])
 
     def test_not_same_number_in_upper_diagonal(self):
         """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, с непостоянными числами в наддиагонали"""
+        матрицы с непостоянными числами в наддиагонали"""
         matrix = [[2, -3, 0, 0], [5, 2, 1, 0], [0, 5, 2, -3], [0, 0, 5, 2]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_not_same_number_in_main_diagonal(self):
         """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, с непостоянными числами в главной диагонали"""
+        матрицы с непостоянными числами в главной диагонали"""
         matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 1, -3], [0, 0, 5, 2]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_not_same_number_in_lower_diagonal(self):
         """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, с непостоянными числами в поддиагонали"""
+        матрицы с непостоянными числами в поддиагонали"""
         matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 1, 2]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_empty_rows_in_matrix(self):
         """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, с пустыми вложенными списками"""
+        матрицы с пустыми вложенными списками"""
         matrix = [[], []]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 

@@ -40,7 +40,6 @@ def validate(matrix):
         if not isinstance(row, list):
             raise Exception(f"Строка {i} не является списком!")
 
-    for row in matrix:
         if len(row) != n:
             raise Exception("Матрица не квадратная!")
 
