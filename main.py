@@ -16,7 +16,7 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
             if type(row) is not list or len(row) != len(matrix):
                 return False
             for val in row:
-                if not val.is_integer():
+                if type(val) is bool or not val.is_integer():
                     return False
         return True
 
@@ -32,7 +32,9 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
         determinant = 0
         for col_idx in range(matrix_order):
             minor = tuple(
-                tuple(matrix[elem][row] for row in range(matrix_order) if row != col_idx)
+                tuple(
+                    matrix[elem][row] for row in range(matrix_order) if row != col_idx
+                )
                 for elem in range(1, matrix_order)
             )
 
