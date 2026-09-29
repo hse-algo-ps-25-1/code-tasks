@@ -1,3 +1,25 @@
+def check_square_matrix(matrix: list[list[int]]) -> None:
+    """Проверяет, что matrix является непустой квадратной матрицей
+    из целых чисел.
+
+    :param matrix: проверяемая матрица
+    :raises Exception: если matrix не является такой матрицей
+    """
+    if not isinstance(matrix, list):
+        raise Exception("Матрица должна быть списком строк")
+
+    n = len(matrix)
+    if n == 0:
+        raise Exception("Матрица не должна быть пустой")
+
+    for row in matrix:
+        if not isinstance(row, list) or len(row) != n:
+            raise Exception("Матрица должна быть квадратной")
+        for element in row:
+            if type(element) is not int:
+                raise Exception("Элементы матрицы должны быть целыми числами")
+
+
 def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     """Итеративное вычисление определителя трёхдиагональной матрицы.
 
@@ -7,13 +29,8 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     :raises Exception: если matrix не является такой матрицей
     :return: значение определителя
     """
+    check_square_matrix(matrix)
     n = len(matrix)
-    if n == 0:
-        raise Exception("Матрица должна быть квадратной")
-
-    for row in matrix:
-        if len(row) != n:
-            raise Exception("Матрица должна быть квадратной")
 
     if n == 1:
         return matrix[0][0]

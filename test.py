@@ -29,6 +29,44 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         matrix = [[1, 2, 0, 7], [3, 1, 2, 0], [0, 3, 1, 2], [0, 0, 3, 1]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
+    def test_not_list(self):
+        """Проверяет, что функция выбрасывает исключение при передаче в
+        параметр значения, которое не является списком"""
+        self.assertRaises(Exception, get_tridiagonal_determinant, 5)
+
+    def test_rows_not_lists(self):
+        """Проверяет, что функция выбрасывает исключение, если строки
+        матрицы не являются списками"""
+        self.assertRaises(Exception, get_tridiagonal_determinant, [1, 2])
+
+    def test_empty_row(self):
+        """Проверяет, что функция выбрасывает исключение при передаче
+        матрицы с пустой строкой"""
+        self.assertRaises(Exception, get_tridiagonal_determinant, [[]])
+
+    def test_not_square_different_rows(self):
+        """Проверяет, что функция выбрасывает исключение при передаче
+        матрицы, строки которой разной длины"""
+        matrix = [[1, 2, 0], [3, 1], [0, 3, 1]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_float_element(self):
+        """Проверяет, что функция выбрасывает исключение при передаче
+        матрицы с дробным элементом"""
+        matrix = [[1.5, 2], [3, 1.5]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_string_element(self):
+        """Проверяет, что функция выбрасывает исключение при передаче
+        матрицы со строковым элементом"""
+        self.assertRaises(Exception, get_tridiagonal_determinant, [["1"]])
+
+    def test_none_element(self):
+        """Проверяет, что функция выбрасывает исключение при передаче
+        матрицы с элементом None"""
+        matrix = [[1, None], [3, 1]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
     def test_first_order(self):
         """Проверяет расчет определителя для матрицы порядка 1"""
         matrix = [[1]]
