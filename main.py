@@ -10,13 +10,13 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
     """
 
     def valid_matrix(matrix):
-        if not matrix or type(matrix) is not list:
+        if not matrix or type(matrix) not in (list, tuple):
             return False
         for row in matrix:
-            if type(row) is not list or len(row) != len(matrix):
+            if type(row) not in (list,tuple) or len(row) != len(matrix):
                 return False
             for val in row:
-                if type(val) is not (int or float) or not val.is_integer():
+                if type(val) not in (int, float) or not val.is_integer():
                     return False
         return True
 
