@@ -32,8 +32,30 @@ class TestTridiagonalDeterminant(unittest.TestCase):
     def test_not_integer(self):
         """Проверяет, что функция выбрасывает исключение при передаче
         нецелого числа"""
-        matrix = [[2.1, -3.3, 0, 0], [5, 2, -3, 0.7], [0, 5, 2, -3.2], [0, 0, 5, 2]]
+        matrix = [[2.1]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_invalid_row_type(self):
+        """Проверяет, что все строки являются списками."""
+        cases = [
+            ("none", [None]),
+            ("integer", [1]),
+            ("string", ["1"]),
+            ("tuple", [(1, 2), (3, 1)]),
+            ("invalid_second_row", [[1, 2], None]),
+        ]
+
+        # subTest позволяет проверить несколько случаев в одном методе и увидеть,
+        # какой именно случай упал.
+        for name, matrix in cases:
+            with self.subTest(case=name):
+                self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_invalid_element_type(self):
+        """Проверяет, что нет нецелочисленных элементов и логических значений."""
+        for value in (None, "1", 1.0, True, False):
+            with self.subTest(value=value):
+                self.assertRaises(Exception, get_tridiagonal_determinant, [[value]])
 
     def test_not_same_number_in_upper_diagonal(self):
         """Проверяет, что функция выбрасывает исключение при передаче
@@ -57,18 +79,6 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         """Проверяет, что функция выбрасывает исключение при передаче
         матрицы, с пустыми вложенными списками"""
         matrix = [[], []]
-        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
-
-    def test_null_upper_diagonal(self):
-        """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, с постоянными нулевыми элементами в наддиагонали"""
-        matrix = [[1, 0, 0], [-4, 1, 0], [0, -4, 1]]
-        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
-
-    def test_null_lower_diagonal(self):
-        """Проверяет, что функция выбрасывает исключение при передаче
-        матрицы, со постоянными нулевыми элементами в поддиагонали"""
-        matrix = [[1, -2, 0], [0, 1, -2], [0, 0, 1]]
         self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
     def test_first_order(self):

@@ -4,7 +4,8 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     :param matrix: квадратная целочисленная трёхдиагональная матрица
         порядка не меньше 1 с постоянными значениями на каждой
         из трёх диагоналей
-    :raises Exception: если matrix не является такой матрицей
+    :raises Exception: если матрица, строки или элементы имеют неверный тип,
+    либо если размер или структура не соответствуют требованиям
     :return: значение определителя
     """
 
@@ -27,6 +28,7 @@ def get_values(matrix):
 
 
 def validate(matrix):
+    """Проверяет типы, размер и структуру матрицы."""
     if not isinstance(matrix, list):
         raise Exception("Неправильный тип матрицы!")
 
@@ -34,55 +36,61 @@ def validate(matrix):
     if n < 1:
         raise Exception("Неправильный порядок матрицы!")
 
+    for i, row in enumerate(matrix):
+        if not isinstance(row, list):
+            raise Exception(f"Строка {i} не является списком!")
+
     for row in matrix:
         if len(row) != n:
             raise Exception("Матрица не квадратная!")
 
-    a, b, c = get_values(matrix)
-
-    if n > 1:
-        # В трёхдиагональной матрице элементы в наддиагонали и поддиагонали
-        # не равны нулю, иначе это не трёхдиагональная матрица
-        if b == 0 or c == 0:
-            raise Exception("Матрица не трёхдиагональная!")
-
-    for i in range(n):
-        for j in range(n):
-            if not isinstance(matrix[i][j], int):
+    for i, row in enumerate(matrix):
+        for j, value in enumerate(row):
+            if isinstance(value, bool) or not isinstance(value, int):
                 raise Exception(
-                    f"Есть нецелочисленный элемент матрицы в строке {i}, столбце {j}!"
+                    f"Элемент в строке {i}, столбце {j} должен быть целым числом!"
                 )
 
-            # Проверка структуры вынесена в отдельную функцию
-            # Поскольку было предупреждение ruff C901
-            validate_matrix_structure(i, j, matrix, a, b, c)
+    a, b, c = get_values(matrix)
+
+    # Проверка структуры вынесена в отдельную функцию
+    # Поскольку было предупреждение ruff C901
+    validate_matrix_structure(matrix, a, b, c)
 
 
-def validate_matrix_structure(i, j, matrix, a, b, c):
-    if i == j:
-        if matrix[i][j] != a:
-            raise Exception("Непостоянные значения на главной диагонали!")
-    elif i == j - 1:
-        if matrix[i][j] != b:
-            raise Exception("Непостоянные значения на наддиагонали!")
-    elif i == j + 1:
-        if matrix[i][j] != c:
-            raise Exception("Непостоянные значения на поддиагонали!")
-    else:
-        if matrix[i][j] != 0:
-            raise Exception("Ненулевой элемент вне трёх диагоналей!")
+def validate_matrix_structure(matrix, a, b, c):
+    """Проверяет постоянство 3 главных диагоналей и нули вне этих трёх диагоналей."""
+    for i, row in enumerate(matrix):
+        for j, value in enumerate(row):
+            if i == j:
+                if value != a:
+                    raise Exception("Непостоянные значения на главной диагонали!")
+            elif j == i + 1:
+                if value != b:
+                    raise Exception("Непостоянные значения на наддиагонали!")
+            elif i == j + 1:
+                if value != c:
+                    raise Exception("Непостоянные значения на поддиагонали!")
+            elif value != 0:
+                raise Exception("Ненулевой элемент вне трёх диагоналей!")
 
 
 def __get_tridiagonal_determinant(a, b, c, n):
-    if n == 1:
-        return a
+    """Рекурсивное вычисление определителя с использованием рекуррентного соотношения и
+    сохранением промежуточных результатов в словарь."""
+    determinants = {
+        1: a,
+        2: a**2 - b * c,
+    }
 
-    if n == 2:
-        return a**2 - b * c
+    def calculate(order: int) -> int:
+        if order not in determinants:
+            determinants[order] = a * calculate(order - 1) - b * c * calculate(
+                order - 2
+            )
+        return determinants[order]
 
-    return a * __get_tridiagonal_determinant(
-        a, b, c, n - 1
-    ) - b * c * __get_tridiagonal_determinant(a, b, c, n - 2)
+    return calculate(n)
 
 
 def main():
