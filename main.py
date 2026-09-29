@@ -16,7 +16,7 @@ def calculate_determinant(matrix: list[list[int]]) -> int:
             if type(row) is not list or len(row) != len(matrix):
                 return False
             for val in row:
-                if type(val) is bool or not val.is_integer():
+                if type(val) is not (int or float) or not val.is_integer():
                     return False
         return True
 
