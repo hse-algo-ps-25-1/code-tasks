@@ -1,7 +1,7 @@
 def get_tridiagonal_determinant(matrix: list[list[float]]) -> float:
     if not matrix:
         raise ValueError("Matrix is empty")
-    
+
     n = len(matrix)
     for row in matrix:
         if len(row) != n:
@@ -24,7 +24,7 @@ def get_tridiagonal_determinant(matrix: list[list[float]]) -> float:
     current_d = d_prev1
 
     for i in range(1, n):
-        current_d = a[i] * d_prev1 - c[i-1] * b[i-1] * d_prev2
+        current_d = a[i] * d_prev1 - c[i - 1] * b[i - 1] * d_prev2
         d_prev2 = d_prev1
         d_prev1 = current_d
 
