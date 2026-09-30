@@ -1,6 +1,4 @@
 def __validate(matrix: list[list[int]]) -> None:
-    if matrix is None or not isinstance(matrix, list):
-        raise ValueError("Матрица не должна быть пустой.")
     if not matrix or not matrix[0]:
         raise ValueError("Матрица не должна быть пустой.")
     n = len(matrix)
