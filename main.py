@@ -1,10 +1,35 @@
 def __validate(matrix: list[list[int]]) -> None:
+    if matrix is None or not isinstance(matrix, list):
+        raise ValueError("Матрица не должна быть пустой.")
     if not matrix or not matrix[0]:
         raise ValueError("Матрица не должна быть пустой.")
     n = len(matrix)
     for row in matrix:
-        if len(row) != n:
-            raise ValueError("Матрица должна быть квадратной.")
+        if not isinstance(row, list) or len(row) != n:
+            raise ValueError("Матрица не должна быть квадратной.")
+        for value in row:
+            if not isinstance(value, int) or isinstance(value, bool):
+                raise ValueError("Элементы матрицы должны быть целыми.")
+
+    a = matrix[0][0]
+    b = matrix[0][1] if n >= 2 else 0
+    c = matrix[1][0] if n >= 2 else 0
+
+    for i in range(n):
+        for j in range(n):
+            value = matrix[i][j]
+            if abs(i - j) > 1:
+                if value != 0:
+                    raise ValueError("Матрица должна быть трёхдиагональной.")
+            elif i == j:
+                if value != a:
+                    raise ValueError("Значения на главной диагонали должны быть одинаковыми.")
+            elif j == i + 1:
+                if value != b:
+                    raise ValueError("Значения на наддиагонали должны быть одинаковыми.")
+            elif i == j + 1:
+                if value != c:
+                    raise ValueError("Значения на поддиагонали должны быть одинаковыми.")
 
 def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     """Итеративное вычисление определителя трёхдиагональной матрицы.
@@ -40,7 +65,6 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
         prev1 = current
 
     return prev1
-
 
 def main():
     matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 5, 2]]
