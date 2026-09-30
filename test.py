@@ -86,7 +86,66 @@ class TestTridiagonalDeterminant(unittest.TestCase):
         """Проверяет расчет определителя для матрицы порядка 4"""
         matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 5, 2]]
         self.assertEqual(get_tridiagonal_determinant(matrix), 421)
+        
+    def test_six_order(self):
+        """Проверяет расчет определителя для матрицы порядка 6"""
+        matrix = [[1,1,0,0,0,0], [1,1,1,0,0,0], [0,1,1,1,0,0], [0,0,1,1,1,0], [0,0,0,1,1,1], [0,0,0,0,1,1]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 1)
 
+    def test_element_superdiagonal_equals_zero(self):
+        """Проверяет расчет определителя матрицы при элементе наддиагонали равной нулю"""
+        matrix = [[5,0,0], [2,5,0], [0,2,5]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 125)
+
+    def test_element_supdiagonal_equals_zero(self):
+        """Проверяет расчет определителя матрицы при элементе поддиагонали равной нулю"""
+        matrix = [[3,1,0], [0,3,1], [0,0,3]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 27)
+
+    def test_element_main_Diagonal_equals_zero_even(self):
+        """Проверяет расчет определителя четной матрицы при элементе главной диагонали равной нулю"""
+        matrix = [[0,4,0,0], [5,0,4,0], [0,5,0,4], [0,0,5,0]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 400)
+
+    def test_element_main_Diagonal_equals_zero_odd(self):
+        """Проверяет расчет определителя нечетной матрицы при элементе главной диагонали равной нулю"""
+        matrix = [[0,4,0], [5,0,4], [0,5,0]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 0)
+
+    def test_elements_superdiagonal_and_subdiagonal_equals_zero(self):
+        """Проверяет расчет определителя матрицы при элементах наддиагонали и поддиагонали равных нулю"""
+        matrix = [[2,0,0], [0,2,0], [0,0,2]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 8)
+
+    def test_negative_elements_superdiagonal_and_subdiagonal(self):
+        """Проверяет расчет определителя матрицы при негативных элементах наддиагонали и поддиагонали"""
+        matrix = [[2,-1,0], [-3,2,-1], [0,-3,2]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), -4)
+
+    def test_not_zero_element_under_the_tape(self):
+        """Проверяет, что функция выбрасывает исключение, если под лентой находится ненулевой элемент"""
+        matrix = [[1,5,0,0], [2,1,5,0], [0,2,1,5], [7,0,2,1]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_diff_element_main_Diagonal(self):
+        """Проверяет, что на главной диагонали все элементы равны"""
+        matrix = [[1,2,0], [3,4,2], [0,3,2]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_diff_element_subdiagonal(self):
+        """Проверяет, что элементы поддиагонали равны"""
+        matrix = [[1,2,0], [5,1,2], [0,4,1]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_diff_element_superdiagonal(self):
+        """Проверяет, что элементы наддиагонали равны"""
+        matrix = [[1,2,0], [5,1,3], [0,5,1]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
+    def test_tuple(self):
+        """Проверяет, что на вход поступила матрица списком, а не кортежем"""
+        matrix = [(1,2), (3,1)]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
 
 if __name__ == "__main__":
     unittest.main()
