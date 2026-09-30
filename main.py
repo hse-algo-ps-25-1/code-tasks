@@ -4,7 +4,7 @@ def __validate(matrix: list[list[int]]) -> None:
     n = len(matrix)
     for row in matrix:
         if len(row) != n:
-            raise ValueError("Матрица не должна быть квадратной.")
+            raise ValueError("Матрица должна быть квадратной.")
 
 def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     """Итеративное вычисление определителя трёхдиагональной матрицы.
