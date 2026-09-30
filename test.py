@@ -7,6 +7,34 @@ class TestTridiagonalDeterminant(unittest.TestCase):
     """Набор тестов для проверки функции вычисления определителя
     трёхдиагональной ленточной матрицы"""
 
+    def test_fifth_order(self):
+        """Проверяет расчет определителя для матрицы порядка 5"""
+        matrix = [
+            [2, -3, 0, 0, 0],
+            [5, 2, -3, 0, 0],
+            [0, 5, 2, -3, 0],
+            [0, 0, 5, 2, -3],
+            [0, 0, 0, 5, 2],
+        ]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 1862)
+
+    def test_zero_on_diagonal(self):
+        """Проверяет расчет определителя, когда на наддиагонали нули"""
+        matrix = [[3, 0, 0], [5, 3, 0], [0, 5, 3]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), 27)
+
+    def test_negative_values(self):
+        """Проверяет расчет определителя для матрицы с отрицательными числами"""
+        matrix = [[-1, -2], [-3, -1]]
+        self.assertEqual(get_tridiagonal_determinant(matrix), -5)
+
+    def test_fractional_num(self):
+        """Проверяет, что функция выбрасыввет искл.
+        при передаче матрицы с нецелым числом
+        """
+        matrix = [[1.5]]
+        self.assertRaises(Exception, get_tridiagonal_determinant, matrix)
+
     def test_none(self):
         """Проверяет, что функция выбрасывает исключение при передаче в
         параметр значения None"""
