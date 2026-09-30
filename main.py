@@ -1,6 +1,13 @@
 def _is_square_int_matrix(matrix: object) -> bool:
+    """Проверяет, является ли объект непустой квадратной целичисленной матрицей.
+
+    :param matrix: произвольный объект для валидации
+    :return: True, если matrix - это непустой list[list[int]] размера N x N (без bool),
+    иначе False
+    """
     if not isinstance(matrix, list) or not matrix:
         return False
+
     order = len(matrix)
     for row in matrix:
         if not isinstance(row, list) or len(row) != order:
@@ -11,17 +18,14 @@ def _is_square_int_matrix(matrix: object) -> bool:
     return True
 
 
-def calculate_determinant(matrix: list[list[int]], validated: bool = True) -> int:
-    """Вычисляет определитель разложением по строке.
+def _calculate_determinant_rec(matrix: list[list[int]]) -> int:
+    """Внутренняя рекурсивная функция вычисления определителя.
 
-    :param matrix: квадратная целочисленная матрица порядка не меньше 1
-    :param validate: проверять вход (True - только на верхнем вызове)
-    :raises Exception: если matrix не является такой матрицей
+    Предполагает, что входная матрица уже прошла валидацию.
+
+    :param matrix: квадратная целочисленная матрица
     :return: значение определителя
     """
-    if validated and not _is_square_int_matrix(matrix):
-        raise ValueError("Ожидается непустая квадратная целочисленная матрица")
-
     order = len(matrix)
     if order == 1:
         return matrix[0][0]
@@ -34,9 +38,22 @@ def calculate_determinant(matrix: list[list[int]], validated: bool = True) -> in
             del row_copy[column]
             minor.append(row_copy)
         sign = 1 if column % 2 == 0 else -1
-        determinant += sign * value * calculate_determinant(minor, validated=False)
+        determinant += sign * value * _calculate_determinant_rec(minor)
 
     return determinant
+
+
+def calculate_determinant(matrix: list[list[int]]) -> int:
+    """Вычисляет опеределитель квадратной целочисленной матрицы разложением по строке.
+
+    :param matrix: квадратная целочисленная матрица порядка не меньше 1
+    :raise ValueError: если matrix не является корректной квадратной матрицей
+    :return: значение определителя
+    """
+    if not _is_square_int_matrix(matrix):
+        raise ValueError("Ожидается непустая квадратная целочисленная матрица")
+
+    return _calculate_determinant_rec(matrix)
 
 
 def main() -> None:
