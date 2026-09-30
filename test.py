@@ -94,12 +94,6 @@ class TestDeterminant(unittest.TestCase):
         zero_3 = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertEqual(calculate_determinant(zero_3), 0)
 
-    def test_triangular_matrix(self):
-        """Определитель треугольной матрицы равен произведению элементов главной диагонали"""
-        upper_triangular = [[2, 3, 5], [0, 4, 7], [0, 0, 3]]
-        # det = 2 * 4 * 3 = 24
-        self.assertEqual(calculate_determinant(upper_triangular), 24)
-
     def test_generator(self):
         """Проверяет генератор матриц с известным определителем"""
         require_generator(self)

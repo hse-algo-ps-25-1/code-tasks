@@ -1,5 +1,5 @@
 def _is_square_int_matrix(matrix: object) -> bool:
-    """Проверяет, является ли объект непустой квадратной целичисленной матрицей.
+    """Проверяет, является ли объект непустой квадратной целочисленной матрицей.
 
     :param matrix: произвольный объект для валидации
     :return: True, если matrix - это непустой list[list[int]] размера N x N (без bool),
@@ -44,10 +44,10 @@ def _calculate_determinant_rec(matrix: list[list[int]]) -> int:
 
 
 def calculate_determinant(matrix: list[list[int]]) -> int:
-    """Вычисляет опеределитель квадратной целочисленной матрицы разложением по строке.
+    """Вычисляет определитель квадратной целочисленной матрицы разложением по строке.
 
     :param matrix: квадратная целочисленная матрица порядка не меньше 1
-    :raise ValueError: если matrix не является корректной квадратной матрицей
+    :raises ValueError: если matrix не является корректной квадратной матрицей
     :return: значение определителя
     """
     if not _is_square_int_matrix(matrix):
