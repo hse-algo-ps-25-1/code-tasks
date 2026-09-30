@@ -21,13 +21,20 @@ def __validate(matrix: list[list[int]]) -> None:
                     raise ValueError("Матрица должна быть трёхдиагональной.")
             elif i == j:
                 if value != a:
-                    raise ValueError("Значения на главной диагонали должны быть одинаковыми.")
+                    raise ValueError(
+                        "Значения на главной диагонали должны быть одинаковыми."
+                    )
             elif j == i + 1:
                 if value != b:
-                    raise ValueError("Значения на наддиагонали должны быть одинаковыми.")
+                    raise ValueError(
+                        "Значения на наддиагонали должны быть одинаковыми."
+                    )
             elif i == j + 1:
                 if value != c:
-                    raise ValueError("Значения на поддиагонали должны быть одинаковыми.")
+                    raise ValueError(
+                        "Значения на поддиагонали должны быть одинаковыми."
+                    )
+
 
 def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
     """Итеративное вычисление определителя трёхдиагональной матрицы.
@@ -63,6 +70,7 @@ def get_tridiagonal_determinant(matrix: list[list[int]]) -> int:
         prev1 = current
 
     return prev1
+
 
 def main():
     matrix = [[2, -3, 0, 0], [5, 2, -3, 0], [0, 5, 2, -3], [0, 0, 5, 2]]
