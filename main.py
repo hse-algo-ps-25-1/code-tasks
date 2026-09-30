@@ -4,7 +4,7 @@ def __validate(matrix: list[list[int]]) -> None:
     n = len(matrix)
     for row in matrix:
         if not isinstance(row, list) or len(row) != n:
-            raise ValueError("Матрица не должна быть квадратной.")
+            raise ValueError("Матрица должна быть квадратной.")
         for value in row:
             if not isinstance(value, int) or isinstance(value, bool):
                 raise ValueError("Элементы матрицы должны быть целыми.")
