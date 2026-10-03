@@ -1,6 +1,7 @@
 from list_node import ListNode
 
-#TODO:перепроверить всё на свежую голову, провести первые тесты
+
+# TODO:перепроверить всё на свежую голову, провести первые тесты
 class LinkedList:
     """
     Класс, реализующий односвязный список.
@@ -31,8 +32,9 @@ class LinkedList:
         Аргументы:
             value: значение нового элемента.
         """
-        if self.size==0:
+        if self.size == 0:
             self.head = ListNode(value)
+            self.size += 1
             return
 
         current_node = self.head
@@ -40,6 +42,7 @@ class LinkedList:
             current_node = current_node.next
 
         current_node.next = ListNode(value)
+        self.size += 1
 
     def insert(self, index, value):
         """
@@ -52,16 +55,15 @@ class LinkedList:
         Исключения:
             IndexError — если индекс вне диапазона.
         """
-        if index>self.size:
+        if index > self.size:
             raise IndexError("Индекс вне диапазона")
         for current_index in range(index):
-            if current_index==0:
+            if current_index == 0:
                 current_node = self.head
             else:
                 current_node = current_node.next
-        new_node = ListNode(value)
-        current_node.next = new_node
-
+        current_node.next = ListNode(value)
+        self.size += 1
 
     def remove(self, value):
         """
@@ -73,13 +75,14 @@ class LinkedList:
         Исключения:
             ValueError — если элемента с таким значением нет.
         """
-        if self.size==0:
-            raise ValueError('Невозможно удалить значение из пустого списка')
+        if self.size == 0:
+            raise ValueError("Невозможно удалить значение из пустого списка")
         for current_node in self:
-            if current_node.next.value==value:
+            if current_node.next.value == value:
                 current_node.next = current_node.next.next
+                self.size -= 1
                 return
-        raise  ValueError('Указанное значение отсутствует')
+        raise ValueError("Указанное значение отсутствует")
 
     def index(self, value):
         """
