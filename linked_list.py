@@ -21,12 +21,12 @@ class LinkedList:
         - строковое представление (__str__).
     """
 
-    def __init__(self)->None:
+    def __init__(self) -> None:
         """Создаёт пустой связный список."""
         self.head: ListNode | None = None
         self.size: int = 0
 
-    def append(self, value: Any)->None:
+    def append(self, value: Any) -> None:
         """
         Добавляет элемент в конец списка.
 
@@ -45,7 +45,7 @@ class LinkedList:
 
         self.size += 1
 
-    def insert(self, index:int, value:Any)->None:
+    def insert(self, index: int, value: Any) -> None:
         """
         Вставляет элемент по указанному индексу.
 
@@ -56,7 +56,7 @@ class LinkedList:
         Исключения:
             IndexError — если индекс вне диапазона.
         """
-        if index > self.size:
+        if not (0 <= index <= self.size):
             raise IndexError("Индекс вне диапазона")
 
         new_node = ListNode(value)
@@ -74,7 +74,7 @@ class LinkedList:
 
         self.size += 1
 
-    def remove(self, value):
+    def remove(self, value: Any) -> None:
         """
         Удаляет первый элемент с указанным значением.
 
@@ -102,7 +102,7 @@ class LinkedList:
 
         raise ValueError(f"Значение {value!r} отсутствует")
 
-    def index(self, value:Any)->int:
+    def index(self, value: Any) -> int | None:
         """
         Возвращает индекс первого элемента с указанным значением.
 
@@ -119,13 +119,13 @@ class LinkedList:
                 return idx
             current_node = current_node.next
 
-        raise ValueError(f"Значения {value!r} нет в списке")
+        return None
 
-    def __len__(self)->int:
+    def __len__(self) -> int:
         """Возвращает количество элементов в списке."""
         return self.size
 
-    def __iter__(self)-> Iterator[Any]:
+    def __iter__(self) -> Iterator[Any]:
         """
         Позволяет итерироваться по значениям элементов списка в цикле for.
 
@@ -138,7 +138,7 @@ class LinkedList:
             yield current.value
             current = current.next
 
-    def __str__(self)->str:
+    def __str__(self) -> str:
         """
         Возвращает строковое представление списка.
 
