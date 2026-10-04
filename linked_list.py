@@ -33,16 +33,16 @@ class LinkedList:
         Аргументы:
             value: значение нового элемента.
         """
-        new_node = ListNode(value)
+        #Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
+        dummy = ListNode(None)
+        dummy.next = self.head
+        current = dummy
 
-        if self.head is None:
-            self.head = new_node
-        else:
-            current_node = self.head
-            while current_node.next:
-                current_node = current_node.next
-            current_node.next = new_node
+        while current.next is not None:
+            current = current.next
 
+        current.next = ListNode(value)
+        self.head = dummy.next
         self.size += 1
 
     def insert(self, index: int, value: Any) -> None:
@@ -56,22 +56,17 @@ class LinkedList:
         Исключения:
             IndexError — если индекс вне диапазона.
         """
-        if not (0 <= index <= self.size):
-            raise IndexError("Индекс вне диапазона")
+        dummy = ListNode(None)
+        dummy.next = self.head
+        prev = dummy
+
+        for _ in range(index):
+            prev = prev.next
 
         new_node = ListNode(value)
-
-        if index == 0:
-            new_node.next = self.head
-            self.head = new_node
-        else:
-            current_node = self.head
-            for _ in range(index - 1):
-                current_node = current_node.next
-
-            new_node.next = current_node.next
-            current_node.next = new_node
-
+        new_node.next = prev.next
+        prev.next = new_node
+        self.head = dummy.next
         self.size += 1
 
     def remove(self, value: Any) -> None:
@@ -84,23 +79,25 @@ class LinkedList:
         Исключения:
             ValueError — если элемента с таким значением нет.
         """
-        if self.head is None:
-            raise ValueError("Невозможно удалить значение из пустого списка")
 
-        if self.head.value == value:
-            self.head = self.head.next
-            self.size -= 1
-            return
+        def remove(self, value: Any|None) -> None:
+            if self.size == 0:
+                raise ValueError("Невозможно удалить значение из пустого списка")
 
-        current_node = self.head
-        while current_node.next:
-            if current_node.next.value == value:
-                current_node.next = current_node.next.next
-                self.size -= 1
-                return
-            current_node = current_node.next
+            dummy = ListNode(None)
+            dummy.next = self.head
+            current = dummy
 
-        raise ValueError(f"Значение {value!r} отсутствует")
+            while current.next is not None:
+                if current.next.value == value:
+                    current.next = current.next.next
+                    self.head = dummy.next
+                    self.size -= 1
+                    return
+
+                current = current.next
+
+            raise ValueError(f"Значение {value!r} отсутствует")
 
     def index(self, value: Any) -> int | None:
         """
