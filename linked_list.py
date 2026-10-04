@@ -1,7 +1,6 @@
 from list_node import ListNode
 
 
-# TODO:перепроверить всё на свежую голову, провести первые тесты
 class LinkedList:
     """
     Класс, реализующий односвязный список.
@@ -32,16 +31,16 @@ class LinkedList:
         Аргументы:
             value: значение нового элемента.
         """
+        new_node = ListNode(value)
+
         if self.size == 0:
-            self.head = ListNode(value)
-            self.size += 1
-            return
+            self.head = new_node
+        else:
+            current_node = self.head
+            while current_node.next:
+                current_node = current_node.next
+            current_node.next = new_node
 
-        current_node = self.head
-        while current_node.next:
-            current_node = current_node.next
-
-        current_node.next = ListNode(value)
         self.size += 1
 
     def insert(self, index, value):
@@ -57,12 +56,20 @@ class LinkedList:
         """
         if index > self.size:
             raise IndexError("Индекс вне диапазона")
-        for current_index in range(index):
-            if current_index == 0:
-                current_node = self.head
-            else:
+
+        new_node = ListNode(value)
+
+        if index == 0:
+            new_node.next = self.head
+            self.head = new_node
+        else:
+            current_node = self.head
+            for _ in range(index - 1):
                 current_node = current_node.next
-        current_node.next = ListNode(value, current_node.next)
+
+            new_node.next = current_node.next
+            current_node.next = new_node
+
         self.size += 1
 
     def remove(self, value):
@@ -80,14 +87,18 @@ class LinkedList:
 
         if self.head.value == value:
             self.head = self.head.next
+            self.size -= 1
             return
+
         current_node = self.head
         while current_node.next:
             if current_node.next.value == value:
                 current_node.next = current_node.next.next
+                self.size -= 1
                 return
             current_node = current_node.next
-        raise ValueError("Указанное значение отсутствует")
+
+        raise ValueError(f"Значение {value!r} отсутствует")
 
     def index(self, value):
         """
@@ -100,13 +111,13 @@ class LinkedList:
             int: индекс элемента, если найден.
             None: если элемент отсутствует.
         """
-        target_val = None
         current_node = self.head
         for idx in range(self.size):
             if current_node.value == value:
-                target_val = current_node.value
-                break
-        return idx
+                return idx
+            current_node = current_node.next
+
+        raise ValueError(f"Значения {value!r} нет в списке")
 
     def __len__(self):
         """Возвращает количество элементов в списке."""
