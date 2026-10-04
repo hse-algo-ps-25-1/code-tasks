@@ -33,7 +33,7 @@ class LinkedList:
         Аргументы:
             value: значение нового элемента.
         """
-        #Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
+        # Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
         dummy = ListNode(None)
         dummy.next = self.head
         current = dummy
@@ -80,7 +80,7 @@ class LinkedList:
             ValueError — если элемента с таким значением нет.
         """
 
-        def remove(self, value: Any|None) -> None:
+        def remove(self, value: Any | None) -> None:
             if self.size == 0:
                 raise ValueError("Невозможно удалить значение из пустого списка")
 
@@ -145,5 +145,4 @@ class LinkedList:
         Пустой список:
             []
         """
-        values = [str(v) for v in self]
-        return "[" + " -> ".join(values) + "]"
+        return "[" + " -> ".join(str(v) for v in self) + "]"
