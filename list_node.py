@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class ListNode:
     """
     Класс, описывающий узел (элемент) связного списка.
@@ -8,6 +11,6 @@ class ListNode:
             (или None, если это последний элемент).
     """
 
-    def __init__(self, value, next=None):
+    def __init__(self, value:Any, next: ListNode | None =None) -> None:
         self.value = value
         self.next = next

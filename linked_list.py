@@ -35,7 +35,7 @@ class LinkedList:
         """
         new_node = ListNode(value)
 
-        if self.size == 0:
+        if self.head is None:
             self.head = new_node
         else:
             current_node = self.head
@@ -84,7 +84,7 @@ class LinkedList:
         Исключения:
             ValueError — если элемента с таким значением нет.
         """
-        if self.size == 0:
+        if self.head is None:
             raise ValueError("Невозможно удалить значение из пустого списка")
 
         if self.head.value == value:
@@ -133,10 +133,10 @@ class LinkedList:
             for x in my_list:
                 ...
         """
-        current = self.head
-        while current:
-            yield current.value
-            current = current.next
+        current_node = self.head
+        while current_node:
+            yield current_node.value
+            current_node = current_node.next
 
     def __str__(self) -> str:
         """
