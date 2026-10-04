@@ -56,6 +56,8 @@ class LinkedList:
         Исключения:
             IndexError — если индекс вне диапазона.
         """
+        if not (0 <= index < len(self)):
+            raise IndexError("Индекс вне диапазона")
         dummy = ListNode(None)
         dummy.next = self.head
         prev = dummy
