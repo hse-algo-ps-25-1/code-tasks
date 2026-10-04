@@ -62,7 +62,7 @@ class LinkedList:
                 current_node = self.head
             else:
                 current_node = current_node.next
-        current_node.next = ListNode(value)
+        current_node.next = ListNode(value, current_node.next)
         self.size += 1
 
     def remove(self, value):
@@ -77,11 +77,16 @@ class LinkedList:
         """
         if self.size == 0:
             raise ValueError("Невозможно удалить значение из пустого списка")
-        for current_node in self:
+
+        if self.head.value == value:
+            self.head = self.head.next
+            return
+        current_node = self.head
+        while current_node.next:
             if current_node.next.value == value:
                 current_node.next = current_node.next.next
-                self.size -= 1
                 return
+            current_node = current_node.next
         raise ValueError("Указанное значение отсутствует")
 
     def index(self, value):
@@ -97,11 +102,11 @@ class LinkedList:
         """
         target_val = None
         current_node = self.head
-        for _ in range(self.size):
+        for idx in range(self.size):
             if current_node.value == value:
                 target_val = current_node.value
                 break
-        return target_val
+        return idx
 
     def __len__(self):
         """Возвращает количество элементов в списке."""
@@ -117,7 +122,7 @@ class LinkedList:
         """
         current = self.head
         while current:
-            yield current.data
+            yield current.value
             current = current.next
 
     def __str__(self):
