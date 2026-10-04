@@ -1,3 +1,5 @@
+from typing import Any, Iterator
+
 from list_node import ListNode
 
 
@@ -19,12 +21,12 @@ class LinkedList:
         - строковое представление (__str__).
     """
 
-    def __init__(self):
+    def __init__(self)->None:
         """Создаёт пустой связный список."""
-        self.head = None
-        self.size = 0
+        self.head: ListNode | None = None
+        self.size: int = 0
 
-    def append(self, value):
+    def append(self, value: Any)->None:
         """
         Добавляет элемент в конец списка.
 
@@ -43,7 +45,7 @@ class LinkedList:
 
         self.size += 1
 
-    def insert(self, index, value):
+    def insert(self, index:int, value:Any)->None:
         """
         Вставляет элемент по указанному индексу.
 
@@ -100,7 +102,7 @@ class LinkedList:
 
         raise ValueError(f"Значение {value!r} отсутствует")
 
-    def index(self, value):
+    def index(self, value:Any)->int:
         """
         Возвращает индекс первого элемента с указанным значением.
 
@@ -119,11 +121,11 @@ class LinkedList:
 
         raise ValueError(f"Значения {value!r} нет в списке")
 
-    def __len__(self):
+    def __len__(self)->int:
         """Возвращает количество элементов в списке."""
         return self.size
 
-    def __iter__(self):
+    def __iter__(self)-> Iterator[Any]:
         """
         Позволяет итерироваться по значениям элементов списка в цикле for.
 
@@ -136,7 +138,7 @@ class LinkedList:
             yield current.value
             current = current.next
 
-    def __str__(self):
+    def __str__(self)->str:
         """
         Возвращает строковое представление списка.
 
