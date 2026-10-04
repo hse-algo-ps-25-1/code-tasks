@@ -80,24 +80,20 @@ class LinkedList:
             ValueError — если элемента с таким значением нет.
         """
 
-        def remove(self, value: Any | None) -> None:
-            if self.size == 0:
-                raise ValueError("Невозможно удалить значение из пустого списка")
+        dummy = ListNode(None)
+        dummy.next = self.head
+        current = dummy
 
-            dummy = ListNode(None)
-            dummy.next = self.head
-            current = dummy
+        while current.next is not None:
+            if current.next.value == value:
+                current.next = current.next.next
+                self.head = dummy.next
+                self.size -= 1
+                return
 
-            while current.next is not None:
-                if current.next.value == value:
-                    current.next = current.next.next
-                    self.head = dummy.next
-                    self.size -= 1
-                    return
+            current = current.next
 
-                current = current.next
-
-            raise ValueError(f"Значение {value!r} отсутствует")
+        raise ValueError(f"Значение {value!r} отсутствует")
 
     def index(self, value: Any) -> int | None:
         """
