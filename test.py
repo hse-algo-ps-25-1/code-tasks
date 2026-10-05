@@ -138,6 +138,30 @@ class TestLinkedList(unittest.TestCase):
 
         self.assertEqual(old_last.next.value, 20)
         self.assertIsNone(old_last.next.next)
+
+
+    def test_insert_empty(self):
+        """insert по индексу 0 добавляет первый элемент в пустой список."""
+        lst = LinkedList()
+
+        lst.insert(0, 10)
+
+        self.assertEqual(list(lst), [10])
+        self.assertEqual(lst.head.value, 10)
+        self.assertEqual(lst.size, 1)
+
+    def test_insert_first(self):
+        """insert по индексу 0 добавляет элемент в начало."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+
+        lst.insert(0, 5)
+
+        self.assertEqual(list(lst), [5, 10, 20])
+        self.assertEqual(lst.head.value, 5)
+        self.assertEqual(lst.size, 3)
     
     def test_insert_middle(self):
         """insert вставляет элемент в середину списка."""
@@ -147,6 +171,97 @@ class TestLinkedList(unittest.TestCase):
         lst.insert(1, 2)
         self.assertEqual(list(lst), [1, 2, 3])
 
+    def test_insert_last(self):
+        """insert по индексу size добавляет элемент в конец."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+
+        lst.insert(lst.size, 30)
+
+        self.assertEqual(list(lst), [10, 20, 30])
+        self.assertEqual(lst.size, 3)
+
+    def test_insert_negative_index(self):
+        """insert с отрицательным индексом вызывает IndexError."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+
+        with self.assertRaises(IndexError):
+            lst.insert(-1, 5)
+
+        self.assertEqual(list(lst), [10, 20])
+        self.assertEqual(lst.size, 2)
+
+    def test_insert_index_too_large(self):
+        """insert с индексом больше size вызывает IndexError."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+
+        with self.assertRaises(IndexError):
+            lst.insert(3, 30)
+
+        self.assertEqual(list(lst), [10, 20])
+        self.assertEqual(lst.size, 2)
+
+    def test_insert_links(self):
+        """insert правильно меняет связи между узлами."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(30)
+
+        old_second = lst.head.next
+
+        lst.insert(1, 20)
+
+        self.assertEqual(lst.head.value, 10)
+        self.assertEqual(lst.head.next.value, 20)
+        self.assertIs(lst.head.next.next, old_second)
+        self.assertEqual(lst.head.next.next.value, 30)
+        self.assertIsNone(lst.head.next.next.next)
+
+
+    def test_insert_none(self):
+        """insert вставляет None как обычное значение."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+
+        lst.insert(1, None)
+
+        self.assertEqual(list(lst), [10, None, 20])
+        self.assertEqual(lst.size, 3)
+
+    def test_insert_many_at_zero(self):
+        """insert многократно корректно вставляет элементы в начало."""
+        lst = LinkedList()
+
+        lst.insert(0, 10)
+        lst.insert(0, 20)
+        lst.insert(0, 30)
+        lst.insert(0, 40)
+
+        self.assertEqual(list(lst), [40, 30, 20, 10])
+        self.assertEqual(lst.size, 4)
+        self.assertEqual(lst.head.value, 40)
+
+    def test_insert_many_operations(self):
+        """insert сохраняет правильный порядок после большого числа вставок."""
+        lst = LinkedList()
+
+        for value in range(100):
+            lst.insert(lst.size, value)
+
+        self.assertEqual(list(lst), list(range(100)))
+        self.assertEqual(lst.size, 100)
+        
     def test_index_found(self):
         """index возвращает индекс первого найденного элемента."""
         lst = LinkedList()
