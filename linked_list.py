@@ -33,16 +33,15 @@ class LinkedList:
         Аргументы:
             value: значение нового элемента.
         """
-        # Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
-        dummy = ListNode(None)
-        dummy.next = self.head
-        current = dummy
+        new_node = ListNode(value)
+        if self.head is None:
+            self.head = new_node
+        else:
+            current_node = self.head
+            while current_node.next is not None:
+                current_node = current_node.next
+            current_node.next = new_node
 
-        while current.next is not None:
-            current = current.next
-
-        current.next = ListNode(value)
-        self.head = dummy.next
         self.size += 1
 
     def insert(self, index: int, value: Any) -> None:
@@ -56,8 +55,9 @@ class LinkedList:
         Исключения:
             IndexError — если индекс вне диапазона.
         """
-        if not (0 <= index < len(self)):
+        if not (0 <= index < self.size):
             raise IndexError("Индекс вне диапазона")
+        # Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
         dummy = ListNode(None)
         dummy.next = self.head
         prev = dummy
