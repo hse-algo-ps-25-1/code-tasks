@@ -15,9 +15,20 @@ class TestLinkedList(unittest.TestCase):
     def test_empty_init(self):
         """Новый список пустой: длина 0, head = None."""
         lst = LinkedList()
-        self.assertEqual(len(lst), 0)
+        self.assertEqual(lst.size, 0)
         self.assertIsNone(lst.head)
 
+    def test_lists_independent(self):
+        """Два новых списка создаются независимо друг от друга."""
+        first = LinkedList()
+        second = LinkedList()
+
+        first.append(10)
+
+        self.assertEqual(first.size, 1)
+        self.assertEqual(second.size, 0)
+        self.assertIsNone(second.head)
+    
     def test_append_one(self):
         """append добавляет один элемент в конец."""
         lst = LinkedList()
@@ -33,6 +44,101 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(len(lst), 3)
         self.assertEqual(list(lst), [1, 2, 3])
 
+    def test_append_order_next(self):
+        """append правильно связывает узлы через next."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+        lst.append(30)
+
+        self.assertEqual(lst.head.value, 10)
+        self.assertEqual(lst.head.next.value, 20)
+        self.assertEqual(lst.head.next.next.value, 30)
+        self.assertIsNone(lst.head.next.next.next)
+
+    def test_append_size(self):
+        """append увеличивает size на один после каждого добавления."""
+        lst = LinkedList()
+
+        self.assertEqual(lst.size, 0)
+
+        lst.append(10)
+        self.assertEqual(lst.size, 1)
+
+        lst.append(20)
+        self.assertEqual(lst.size, 2)
+
+        lst.append(30)
+        self.assertEqual(lst.size, 3)
+
+        lst.append(40)
+        self.assertEqual(lst.size, 4)
+
+    def test_append_duplicate_values(self):
+        """append сохраняет повторяющиеся значения как отдельные узлы."""
+        lst = LinkedList()
+
+        lst.append(15)
+        lst.append(15)
+        lst.append(15)
+
+        self.assertEqual(list(lst), [15, 15, 15])
+        self.assertEqual(len(lst), 3)
+
+    def test_append_different_value_types(self):
+        """append сохраняет значения разных типов."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(9.14)
+        lst.append("text")
+        lst.append(True)
+        lst.append(None)
+        lst.append([1, 2])
+        lst.append({"a": 1})
+        self.assertEqual(
+            list(lst),
+            [10, 9.14, "text", True, None, [1, 2], {"a": 1}],
+        )
+
+    def test_append_head_unchanged(self):
+        """append не меняет первый узел после последующих добавлений."""
+        lst = LinkedList()
+
+        lst.append(10)
+        first_node = lst.head
+
+        lst.append(20)
+        lst.append(30)
+
+        self.assertIs(lst.head, first_node)
+
+    def test_append_last_next_is_none(self):
+        """После append последний узел имеет next = None."""
+        lst = LinkedList()
+
+        lst.append(10)
+        lst.append(20)
+        lst.append(30)
+
+        last_node = lst.head.next.next
+
+        self.assertEqual(last_node.value, 30)
+        self.assertIsNone(last_node.next)
+
+    def test_append_updates_last_next(self):
+        """append связывает предыдущий последний узел с новым."""
+        lst = LinkedList()
+
+        lst.append(10)
+        old_last = lst.head
+
+        lst.append(20)
+
+        self.assertEqual(old_last.next.value, 20)
+        self.assertIsNone(old_last.next.next)
+    
     def test_insert_middle(self):
         """insert вставляет элемент в середину списка."""
         lst = LinkedList()
