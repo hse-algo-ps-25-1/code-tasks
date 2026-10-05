@@ -22,6 +22,21 @@ class TestStarsAndBars(unittest.TestCase):
         """Проверяет, что функция выбрасывает исключение при отрицательном k"""
         self.assertRaises(Exception, stars_and_bars, 3, -1)
 
+    def test_invalid_types(self):
+        """Проверяет, что функция выбрасывает исключение при передаче нецелых чисел"""
+        for value in ("1", 1.0, True, False):
+            with self.subTest(n=value):
+                self.assertRaises(Exception, stars_and_bars, value, 1)
+            with self.subTest(k=value):
+                self.assertRaises(Exception, stars_and_bars, 1, value)
+
+    def test_return_types(self):
+        """Проверят, что функция возвращает список строк"""
+        result = stars_and_bars(2, 2)
+        self.assertIsInstance(result, list)
+        for item in result:
+            self.assertIsInstance(item, str)
+
     def test_one_box(self):
         """Проверяет единственную строку при одном ящике"""
         self.assertEqual(stars_and_bars(1, 3), ["***"])
