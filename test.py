@@ -1,13 +1,6 @@
 import unittest
 
 from linked_list import LinkedList
-"""
-TODO: некоторые идеи для тестов:
-1.Проверить работу с разными типами данных(которые входят в аннотацию) их добавление и удаление. None заслуживает отдельного внимания
-2.Проверить краевые случаи, когда индекс равен нулю или size-1 
-3.Убедиться что size работает корректно, и нет способа вывалиться за границы массива с его помощью
-Удалить этот комментарий, когда работа будет закончена
-"""
 
 class TestLinkedList(unittest.TestCase):
     """Набор тестов для класса LinkedList."""
@@ -17,6 +10,12 @@ class TestLinkedList(unittest.TestCase):
         lst = LinkedList()
         self.assertEqual(lst.size, 0)
         self.assertIsNone(lst.head)
+
+    def test_remove_from_empty(self):
+        """remove вызывает ValueError при попытке удаления из пустого списка."""
+        lst = LinkedList()
+        with self.assertRaises(ValueError):
+            lst.remove(10)
 
     def test_lists_independent(self):
         """Два новых списка создаются независимо друг от друга."""
