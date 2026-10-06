@@ -2,6 +2,7 @@ import unittest
 
 from linked_list import LinkedList
 
+
 class TestLinkedList(unittest.TestCase):
     """Набор тестов для класса LinkedList."""
 
@@ -27,7 +28,7 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(first.size, 1)
         self.assertEqual(second.size, 0)
         self.assertIsNone(second.head)
-    
+
     def test_append_one(self):
         """append добавляет один элемент в конец."""
         lst = LinkedList()
@@ -84,7 +85,7 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(list(lst), [10])
         self.assertEqual(lst.head.value, 10)
         self.assertEqual(lst.size, 1)
-    
+
     def test_insert_last(self):
         """insert по индексу size добавляет элемент в конец."""
         lst = LinkedList()
@@ -236,7 +237,7 @@ class TestLinkedList(unittest.TestCase):
 
         lst.remove(20)
         self.assertEqual(lst.index(20), 2)
-    
+
     def test_iteration(self):
         """Итерация по списку возвращает значения в порядке следования."""
         lst = LinkedList()
