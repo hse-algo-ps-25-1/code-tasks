@@ -58,8 +58,7 @@ class LinkedList:
         if not (0 <= index <= self.size):
             raise IndexError("Индекс вне диапазона")
         # Создаю фиктивный узел для того, чтобы избежать отдельной обработки краевых случаев
-        dummy = ListNode(None)
-        dummy.next = self.head
+        dummy = ListNode(None, self.head)
         prev = dummy
 
         for _ in range(index):
@@ -81,9 +80,7 @@ class LinkedList:
         Исключения:
             ValueError — если элемента с таким значением нет.
         """
-
-        dummy = ListNode(None)
-        dummy.next = self.head
+        dummy = ListNode(None, self.head)
         current = dummy
 
         while current.next is not None:
