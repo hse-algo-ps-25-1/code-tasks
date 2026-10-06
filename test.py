@@ -246,7 +246,6 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual([x for x in lst], [1, 2, 3])
 
     def test_iteration_empty(self):
-
         """Итерация по пустому списку не возвращает элементов."""
         lst = LinkedList()
 
@@ -284,6 +283,7 @@ class TestLinkedList(unittest.TestCase):
             lst.append(val)
 
         self.assertEqual(str(lst), "[10 -> 20 -> 30]")
+
 
 if __name__ == "__main__":
     unittest.main()
