@@ -38,7 +38,8 @@ class TestStarsAndBars(unittest.TestCase):
             self.assertIsInstance(item, str)
 
     def test_string_format_symbols(self):
-        """Проверяет, что в каждой строке только допустимые символы перегородок и звездочек."""
+        """Проверяет, что в каждой строке только
+        допустимые символы перегородок и звездочек."""
         cases = [(1, 0), (2, 1), (3, 4), (4, 5), (5, 0)]
         for n, k in cases:
             with self.subTest(n=n, k=k):
@@ -46,7 +47,8 @@ class TestStarsAndBars(unittest.TestCase):
                     self.assertTrue(set(s) <= {"*", "|"})
 
     def test_strings_length_values(self):
-        """Проверяет по формуле, что результат возвращает правильное суммарное количество символов."""
+        """Проверяет по формуле, что результат возвращает
+        правильное суммарное количество символов."""
         cases = [(3, 0), (5, 2), (2, 5), (4, 2), (4, 5)]
         for n, k in cases:
             with self.subTest(n=n, k=k):
