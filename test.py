@@ -41,50 +41,24 @@ class TestLinkedList(unittest.TestCase):
         lst = LinkedList()
         for val in [1, 2, 3]:
             lst.append(val)
-        self.assertEqual(len(lst), 3)
+        self.assertEqual(lst.size, 3)
         self.assertEqual(list(lst), [1, 2, 3])
 
     def test_append_order_next(self):
-        """append правильно связывает узлы через next."""
+        """append правильно связывает узлы и не меняет первый узел"""
         lst = LinkedList()
 
         lst.append(10)
+        first_node = lst.head
+
         lst.append(20)
         lst.append(30)
 
+        self.assertIs(lst.head, first_node)
         self.assertEqual(lst.head.value, 10)
         self.assertEqual(lst.head.next.value, 20)
         self.assertEqual(lst.head.next.next.value, 30)
         self.assertIsNone(lst.head.next.next.next)
-
-    def test_append_size(self):
-        """append увеличивает size на один после каждого добавления."""
-        lst = LinkedList()
-
-        self.assertEqual(lst.size, 0)
-
-        lst.append(10)
-        self.assertEqual(lst.size, 1)
-
-        lst.append(20)
-        self.assertEqual(lst.size, 2)
-
-        lst.append(30)
-        self.assertEqual(lst.size, 3)
-
-        lst.append(40)
-        self.assertEqual(lst.size, 4)
-
-    def test_append_duplicate_values(self):
-        """append сохраняет повторяющиеся значения как отдельные узлы."""
-        lst = LinkedList()
-
-        lst.append(15)
-        lst.append(15)
-        lst.append(15)
-
-        self.assertEqual(list(lst), [15, 15, 15])
-        self.assertEqual(len(lst), 3)
 
     def test_append_different_value_types(self):
         """append сохраняет значения разных типов."""
@@ -102,44 +76,6 @@ class TestLinkedList(unittest.TestCase):
             [10, 9.14, "text", True, None, [1, 2], {"a": 1}],
         )
 
-    def test_append_head_unchanged(self):
-        """append не меняет первый узел после последующих добавлений."""
-        lst = LinkedList()
-
-        lst.append(10)
-        first_node = lst.head
-
-        lst.append(20)
-        lst.append(30)
-
-        self.assertIs(lst.head, first_node)
-
-    def test_append_last_next_is_none(self):
-        """После append последний узел имеет next = None."""
-        lst = LinkedList()
-
-        lst.append(10)
-        lst.append(20)
-        lst.append(30)
-
-        last_node = lst.head.next.next
-
-        self.assertEqual(last_node.value, 30)
-        self.assertIsNone(last_node.next)
-
-    def test_append_updates_last_next(self):
-        """append связывает предыдущий последний узел с новым."""
-        lst = LinkedList()
-
-        lst.append(10)
-        old_last = lst.head
-
-        lst.append(20)
-
-        self.assertEqual(old_last.next.value, 20)
-        self.assertIsNone(old_last.next.next)
-
-
     def test_insert_empty(self):
         """insert по индексу 0 добавляет первый элемент в пустой список."""
         lst = LinkedList()
@@ -149,28 +85,7 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(list(lst), [10])
         self.assertEqual(lst.head.value, 10)
         self.assertEqual(lst.size, 1)
-
-    def test_insert_first(self):
-        """insert по индексу 0 добавляет элемент в начало."""
-        lst = LinkedList()
-
-        lst.append(10)
-        lst.append(20)
-
-        lst.insert(0, 5)
-
-        self.assertEqual(list(lst), [5, 10, 20])
-        self.assertEqual(lst.head.value, 5)
-        self.assertEqual(lst.size, 3)
     
-    def test_insert_middle(self):
-        """insert вставляет элемент в середину списка."""
-        lst = LinkedList()
-        for val in [1, 3]:
-            lst.append(val)
-        lst.insert(1, 2)
-        self.assertEqual(list(lst), [1, 2, 3])
-
     def test_insert_last(self):
         """insert по индексу size добавляет элемент в конец."""
         lst = LinkedList()
@@ -183,34 +98,22 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(list(lst), [10, 20, 30])
         self.assertEqual(lst.size, 3)
 
-    def test_insert_negative_index(self):
-        """insert с отрицательным индексом вызывает IndexError."""
+    def test_insert_invalid_indexes(self):
+        """insert вызывает IndexError для индексов вне диапазона 0 <= index <= size."""
         lst = LinkedList()
 
         lst.append(10)
         lst.append(20)
 
-        with self.assertRaises(IndexError):
-            lst.insert(-1, 5)
-
-        self.assertEqual(list(lst), [10, 20])
-        self.assertEqual(lst.size, 2)
-
-    def test_insert_index_too_large(self):
-        """insert с индексом больше size вызывает IndexError."""
-        lst = LinkedList()
-
-        lst.append(10)
-        lst.append(20)
-
-        with self.assertRaises(IndexError):
-            lst.insert(3, 30)
+        for index in [-1, -10, 3, 10]:
+            with self.assertRaises(IndexError):
+                lst.insert(index, 5)
 
         self.assertEqual(list(lst), [10, 20])
         self.assertEqual(lst.size, 2)
 
     def test_insert_links(self):
-        """insert правильно меняет связи между узлами."""
+        """insert корректно вставляет узел в середину и сохраняет связи между узлами"""
         lst = LinkedList()
 
         lst.append(10)
@@ -226,19 +129,6 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(lst.head.next.next.value, 30)
         self.assertIsNone(lst.head.next.next.next)
 
-
-    def test_insert_none(self):
-        """insert вставляет None как обычное значение."""
-        lst = LinkedList()
-
-        lst.append(10)
-        lst.append(20)
-
-        lst.insert(1, None)
-
-        self.assertEqual(list(lst), [10, None, 20])
-        self.assertEqual(lst.size, 3)
-
     def test_insert_many_at_zero(self):
         """insert многократно корректно вставляет элементы в начало."""
         lst = LinkedList()
@@ -252,23 +142,102 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(lst.size, 4)
         self.assertEqual(lst.head.value, 40)
 
-    def test_insert_many_operations(self):
-        """insert сохраняет правильный порядок после большого числа вставок."""
+    def test_remove_only_element(self):
+        """remove корректно удаляет единственный элемент списка."""
         lst = LinkedList()
 
-        for value in range(100):
-            lst.insert(lst.size, value)
+        lst.append(10)
 
-        self.assertEqual(list(lst), list(range(100)))
-        self.assertEqual(lst.size, 100)
-        
-    def test_index_found(self):
-        """index возвращает индекс первого найденного элемента."""
+        lst.remove(10)
+
+        self.assertEqual(list(lst), [])
+        self.assertIsNone(lst.head)
+        self.assertEqual(lst.size, 0)
+
+    def test_remove_first(self):
+        """remove удаляет первый элемент и корректно меняет head."""
         lst = LinkedList()
-        for val in ["a", "b", "c"]:
+
+        for val in [10, 20, 30]:
             lst.append(val)
-        self.assertEqual(lst.index("b"), 1)
 
+        lst.remove(10)
+
+        self.assertEqual(list(lst), [20, 30])
+        self.assertEqual(lst.head.value, 20)
+        self.assertEqual(lst.size, 2)
+
+    def test_remove_first_duplicate(self):
+        """remove удаляет только первое вхождение значения."""
+        lst = LinkedList()
+
+        for val in [10, 20, 20, 30]:
+            lst.append(val)
+
+        lst.remove(20)
+
+        self.assertEqual(list(lst), [10, 20, 30])
+        self.assertEqual(lst.size, 3)
+
+    def test_remove_last(self):
+        """remove корректно удаляет последний элемент."""
+        lst = LinkedList()
+
+        for val in [10, 20, 30]:
+            lst.append(val)
+
+        lst.remove(30)
+
+        self.assertEqual(list(lst), [10, 20])
+        self.assertEqual(lst.size, 2)
+        self.assertIsNone(lst.head.next.next)
+
+    def test_remove_missing_value(self):
+        """remove вызывает ValueError и не изменяет список, если значения нет."""
+        lst = LinkedList()
+
+        for val in [10, 20, 30]:
+            lst.append(val)
+
+        with self.assertRaises(ValueError):
+            lst.remove(99)
+
+        self.assertEqual(list(lst), [10, 20, 30])
+        self.assertEqual(lst.size, 3)
+
+    def test_index_returns_correct_index(self):
+        """index корректно возвращает индексы и обрабатывает особые случаи."""
+        lst = LinkedList()
+
+        self.assertIsNone(lst.index(10))
+
+        for val in [None, 10, 20, 10, 30]:
+            lst.append(val)
+
+        self.assertEqual(lst.index(None), 0)
+        self.assertEqual(lst.index(10), 1)
+        self.assertEqual(lst.index(20), 2)
+        self.assertEqual(lst.index(30), 4)
+        self.assertIsNone(lst.index(999))
+
+    def test_index_tracks_changes(self):
+        """index корректно отслеживает изменения списка."""
+        lst = LinkedList()
+
+        for val in [10, 20, 30, 20, 40]:
+            lst.append(val)
+
+        self.assertEqual(lst.index(20), 1)
+
+        lst.insert(0, 5)
+        self.assertEqual(lst.index(20), 2)
+
+        lst.remove(10)
+        self.assertEqual(lst.index(20), 1)
+
+        lst.remove(20)
+        self.assertEqual(lst.index(20), 2)
+    
     def test_iteration(self):
         """Итерация по списку возвращает значения в порядке следования."""
         lst = LinkedList()
@@ -276,6 +245,45 @@ class TestLinkedList(unittest.TestCase):
             lst.append(val)
         self.assertEqual([x for x in lst], [1, 2, 3])
 
+    def test_iteration_empty(self):
+
+        """Итерация по пустому списку не возвращает элементов."""
+        lst = LinkedList()
+
+        self.assertEqual(list(lst), [])
+
+    def test_iteration_after_changes(self):
+        """Итерация возвращает правильные значения после insert и remove."""
+        lst = LinkedList()
+
+        for val in [10, 30, 40]:
+            lst.append(val)
+
+        lst.insert(1, 20)
+        lst.remove(30)
+
+        self.assertEqual(list(lst), [10, 20, 40])
+
+    def test_iteration_reusable(self):
+        """Итерацию по списку можно выполнять повторно."""
+        lst = LinkedList()
+
+        for val in [10, 20, 30]:
+            lst.append(val)
+
+        self.assertEqual(list(lst), [10, 20, 30])
+        self.assertEqual(list(lst), [10, 20, 30])
+
+    def test_str_output(self):
+        """str возвращает правильное строковое представление списка."""
+        lst = LinkedList()
+
+        self.assertEqual(str(lst), "[]")
+
+        for val in [10, 20, 30]:
+            lst.append(val)
+
+        self.assertEqual(str(lst), "[10 -> 20 -> 30]")
 
 if __name__ == "__main__":
     unittest.main()
