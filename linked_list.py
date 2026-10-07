@@ -38,7 +38,7 @@ class LinkedList:
             self.head = new_node
         else:
             current_node = self.head
-            while current_node.next is not None:
+            while current_node.next:
                 current_node = current_node.next
             current_node.next = new_node
 
@@ -83,7 +83,7 @@ class LinkedList:
         dummy = ListNode(None, self.head)
         current = dummy
 
-        while current.next is not None:
+        while current.next:
             if current.next.value == value:
                 current.next = current.next.next
                 self.head = dummy.next
