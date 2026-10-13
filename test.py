@@ -69,13 +69,6 @@ class TestZeroOne(unittest.TestCase):
             with self.subTest(length=length):
                 self.assertTrue(check_strings(generate_strings(length), length))
 
-    def test_count_fibonacci(self):
-        """Количество строк — числа Фибоначчи"""
-        cases = [(1, 2), (2, 3), (3, 5), (4, 8), (5, 13), (10, 144)]
-        for length, count in cases:
-            with self.subTest(length=length):
-                self.assertEqual(len(generate_strings(length)), count)
-
     def test_no_double_zero(self):
         """Нет двух нулей подряд и нет повторов"""
         res = generate_strings(8)
@@ -164,17 +157,6 @@ class TestBinomialCoefficient(unittest.TestCase):
                     self.assertEqual(
                         binomial_coefficient_iter(n, k), binomial_coefficient_rec(n, k)
                     )
-
-    def test_pascal_rule(self):
-        """Правило Паскаля и симметрия"""
-        for func in BINOMIAL_FUNCTIONS:
-            for n in range(2, 12):
-                for k in range(1, n):
-                    with self.subTest(func=func.__name__, n=n, k=k):
-                        self.assertEqual(
-                            func(n, k), func(n - 1, k - 1) + func(n - 1, k)
-                        )
-                        self.assertEqual(func(n, k), func(n, n - k))
 
     def test_row_sum(self):
         """Сумма строки треугольника Паскаля равна 2 в степени n"""

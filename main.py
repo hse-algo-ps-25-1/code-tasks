@@ -91,14 +91,24 @@ def binomial_coefficient_rec(n: int, k: int) -> int:
     """
     validate_binom(n, k)
 
-    return _pascal_rec(n, k)
+    # дополнитель используем мемоизацию, чтобы снизить рекурсии
+    # количество вызовов и вычислений для больших значений n и k
+    cache = {}
+
+    return _pascal_rec(n, k, cache)
 
 
-def _pascal_rec(n, k):
+def _pascal_rec(n, k, cache):
     if k == 0 or k == n:
         return 1
 
-    return _pascal_rec(n - 1, k) + _pascal_rec(n - 1, k - 1)
+    if (n, k) in cache:
+        return cache[(n, k)]
+
+    result = _pascal_rec(n - 1, k, cache) + _pascal_rec(n - 1, k - 1, cache)
+    cache[(n, k)] = result
+
+    return result
 
 
 def validate_binom(n, k):
