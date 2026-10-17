@@ -95,6 +95,40 @@ class TestMinCostPath(unittest.TestCase):
             Result(cost=6, path=[(0, 0), (0, 1), (0, 2), (1, 2)]),
         )
 
+    def test_single_row(self):
+        """Один строка, только вправо"""
+        self.assertEqual(
+            get_min_cost_path([[1, 2, 3]]),
+            Result(cost=6, path=[(0, 0), (0, 1), (0, 2)]),
+        )
+
+    def test_single_column(self):
+        """Одна столбец, только вниз"""
+        self.assertEqual(
+            get_min_cost_path([[1], [2], [3]]),
+            Result(cost=6, path=[(0, 0), (1, 0), (2, 0)]),
+        )
+
+    def test_equal_paths(self):
+        """Два пути с одинаковой стоимостью"""
+        table = [[1, 1], [1, 1]]
+        result = get_min_cost_path(table)
+        _assert_optimal_result(self, table, result, 3)
+
+    def test_empty_row(self):
+        """Список с пустыми строками"""
+        with self.assertRaises(ValueError) as error:
+            get_min_cost_path([[]])
+        self.assertEqual(str(error.exception), TABLE_NOT_RECT)
+
+    def test_negative_and_zero_values(self):
+        """Таблица с отрицательными числами и нулями"""
+        table = [[1, -2, 0], [3, -1, 2]]
+        self.assertEqual(
+            get_min_cost_path(table),
+            Result(cost=0, path=[(0, 0), (0, 1), (1, 1), (1, 2)]),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
