@@ -26,6 +26,7 @@ def generate_permutations_iter(elements: list) -> list[list]:
     pass
 
 
+
 def main():
     for elements in ([], ["a"], ["a", "b", "c"]):
         print(f"{elements}, рекурсивно: {generate_permutations_rec(elements)}")
