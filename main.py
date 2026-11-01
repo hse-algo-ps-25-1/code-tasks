@@ -1,5 +1,13 @@
 from stack import Stack
 
+BRACKET_PAIRS = {")": "(", "]": "[", "}": "{"}
+OPENING_BRACKETS = "([{"
+
+
+def validate_expression(expression):
+    if not isinstance(expression, str):
+        raise TypeError("Аргумент должен быть строкой")
+
 
 def is_brackets_balanced(expression: str) -> bool:
     """Проверяет парность скобок с помощью Stack.
@@ -13,7 +21,21 @@ def is_brackets_balanced(expression: str) -> bool:
     :raises TypeError: аргумент не строка
     :return: True, если скобки расставлены верно
     """
-    pass
+    validate_expression(expression)
+
+    unclosed_brackets = Stack()
+
+    for char in expression:
+        if char in OPENING_BRACKETS:
+            unclosed_brackets.push(char)
+        elif char in BRACKET_PAIRS:
+            if (
+                unclosed_brackets.is_empty()
+                or unclosed_brackets.pop() != BRACKET_PAIRS[char]
+            ):
+                return False
+
+    return unclosed_brackets.is_empty()
 
 
 def main():
