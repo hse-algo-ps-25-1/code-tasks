@@ -3,6 +3,8 @@ import unittest
 
 from main import generate_permutations_iter, generate_permutations_rec
 
+PERMUTATION_FUNCTIONS = (generate_permutations_rec, generate_permutations_iter)
+
 
 def _same_items(left, right):
     pending = list(right)
@@ -28,21 +30,67 @@ def _assert_all_permutations(test_case, permutations, elements):
 
 
 class TestPermutations(unittest.TestCase):
-    """Публичные примеры генерации перестановок."""
+    """Набор тестов генерации перестановок."""
+
+    def test_empty_list(self):
+        """Пустой список возвращает список из одной пустой перестановки."""
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                self.assertEqual(function([]), [[]])
+
+    def test_single_element(self):
+        """Список из одного элемента."""
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                self.assertEqual(function([42]), [[42]])
 
     def test_two_letters(self):
         """Обе перестановки двух букв."""
         expected = [["a", "b"], ["b", "a"]]
-        for function in (generate_permutations_rec, generate_permutations_iter):
+        for function in PERMUTATION_FUNCTIONS:
             with self.subTest(function=function.__name__):
                 self.assertTrue(_same_items(function(["a", "b"]), expected))
 
     def test_three_letters(self):
         """Все шесть перестановок трёх букв."""
         elements = ["a", "b", "c"]
-        for function in (generate_permutations_rec, generate_permutations_iter):
+        for function in PERMUTATION_FUNCTIONS:
             with self.subTest(function=function.__name__):
                 _assert_all_permutations(self, function(elements), elements)
+
+    def test_four_numbers(self):
+        """Все 24 перестановки четырёх чисел."""
+        elements = [1, 2, 3, 4]
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                _assert_all_permutations(self, function(elements), elements)
+
+    def test_mixed_and_unhashable_elements(self):
+        """Разнородные и нехешируемые элементы (списки, словари, None)."""
+        elements = [1, "a", [2, 3], {"key": "val"}, None]
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                _assert_all_permutations(self, function(elements), elements)
+
+    def test_input_not_mutated(self):
+        """Исходный список не изменяется после вызова функции."""
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                elements = [1, 2, 3]
+                original_copy = list(elements)
+                result = function(elements)
+                self.assertEqual(elements, original_copy)
+                for perm in result:
+                    self.assertIsNot(perm, elements)
+
+    def test_not_a_list_raises_type_error(self):
+        """Передача не списка вызывает TypeError."""
+        invalid_inputs = (None, 123, "abc", (1, 2), {1, 2}, {"a": 1}, True)
+        for function in PERMUTATION_FUNCTIONS:
+            for invalid in invalid_inputs:
+                with self.subTest(function=function.__name__, invalid=invalid):
+                    with self.assertRaises(TypeError):
+                        function(invalid)
 
 
 if __name__ == "__main__":
