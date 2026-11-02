@@ -32,10 +32,17 @@ classDiagram
         +enqueue(value)
         +dequeue()
         +peek()
+        -_head_entry() _QueueEntry
+    }
+
+    class _QueueEntry {
+        +value
+        +__init__(value)
     }
 
     class main {
         <<module>>
+        +validate_args(month, lifetime)
         +rabbits(month: int, lifetime: int) int
         +main()
     }
@@ -45,5 +52,6 @@ classDiagram
     DoublyListNode o-- DoublyListNode : next
     DoublyListNode o-- DoublyListNode : prev
     Queue *-- "1" DoublyLinkedList : _items
-    main ..> Queue : использует
-```
+    Queue ..> _QueueEntry : создаёт
+    DoublyListNode o-- _QueueEntry : value
+    main ..> Queue : использует```

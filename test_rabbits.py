@@ -1,7 +1,7 @@
 import unittest
 from queue import Queue
 
-from main import rabbits
+from main import rabbits, validate_args
 
 
 def simulate(month, lifetime):
@@ -90,6 +90,31 @@ class TestRabbitsExtra(unittest.TestCase):
         import main
 
         self.assertIs(main.Queue, Queue)
+
+
+class TestValidateArgs(unittest.TestCase):
+    def test_valid(self):
+        for args in ((1, 2), (8, 7), (10**20, 10**20)):
+            with self.subTest(args=args):
+                self.assertIsNone(validate_args(*args))
+
+    def test_type_errors(self):
+        for args in ((True, 7), (8, False), (8.0, 7), (8, "7"), (None, 7)):
+            with self.subTest(args=args):
+                with self.assertRaises(TypeError):
+                    validate_args(*args)
+
+    def test_value_errors(self):
+        for args in ((0, 2), (1, 1), (-3, 7)):
+            with self.subTest(args=args):
+                with self.assertRaises(ValueError):
+                    validate_args(*args)
+
+    def test_type_error_before_value_error(self):
+        with self.assertRaises(TypeError):
+            validate_args(0, 7.0)
+        with self.assertRaises(TypeError):
+            validate_args(1.5, 0)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import math
 import unittest
 from queue import Queue
 
@@ -70,6 +71,71 @@ class TestQueueExtra(unittest.TestCase):
         self.assertFalse(queue.is_empty())
         self.assertIsNone(queue.peek())
         self.assertIsNone(queue.dequeue())
+        self.assertTrue(queue.is_empty())
+
+    def test_peek_repeated(self):
+        queue = Queue()
+        queue.enqueue(1)
+        queue.enqueue(2)
+        for _ in range(3):
+            self.assertEqual(queue.peek(), 1)
+            self.assertEqual(len(queue), 2)
+
+    def test_single_element(self):
+        queue = Queue()
+        queue.enqueue("x")
+        self.assertEqual(queue.dequeue(), "x")
+        self.assertTrue(queue.is_empty())
+        with self.assertRaises(IndexError):
+            queue.peek()
+
+    def test_nan(self):
+        queue = Queue()
+        queue.enqueue(float("nan"))
+        queue.enqueue(1)
+        self.assertTrue(math.isnan(queue.peek()))
+        self.assertTrue(math.isnan(queue.dequeue()))
+        self.assertEqual(len(queue), 1)
+        self.assertEqual(queue.dequeue(), 1)
+        self.assertTrue(queue.is_empty())
+
+    def test_same_object_twice(self):
+        value = float("nan")
+        queue = Queue()
+        queue.enqueue(value)
+        queue.enqueue(value)
+        self.assertIs(queue.dequeue(), value)
+        self.assertIs(queue.dequeue(), value)
+        self.assertTrue(queue.is_empty())
+
+    def test_never_equal_object(self):
+        class NeverEqual:
+            def __eq__(self, other):
+                return False
+
+            __hash__ = object.__hash__
+
+        item = NeverEqual()
+        queue = Queue()
+        queue.enqueue(item)
+        self.assertIs(queue.peek(), item)
+        self.assertIs(queue.dequeue(), item)
+        self.assertTrue(queue.is_empty())
+
+    def test_comparison_raises(self):
+        class Uncomparable:
+            def __eq__(self, other):
+                raise RuntimeError("сравнение запрещено")
+
+            def __ne__(self, other):
+                raise RuntimeError("сравнение запрещено")
+
+            __hash__ = object.__hash__
+
+        item = Uncomparable()
+        queue = Queue()
+        queue.enqueue(item)
+        self.assertIs(queue.dequeue(), item)
         self.assertTrue(queue.is_empty())
 
     def test_many_elements(self):

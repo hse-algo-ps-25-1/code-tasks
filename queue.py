@@ -1,6 +1,13 @@
 from doubly_linked_list import DoublyLinkedList
 
 
+class _QueueEntry:
+    __slots__ = ("value",)
+
+    def __init__(self, value):
+        self.value = value
+
+
 class Queue:
     """Структура данных Очередь"""
 
@@ -21,7 +28,7 @@ class Queue:
 
         :param value: новое значение
         """
-        self._items.append(value)
+        self._items.append(_QueueEntry(value))
 
     def dequeue(self):
         """Удаляет и возвращает элемент из начала очереди.
@@ -29,10 +36,10 @@ class Queue:
         :raises IndexError: очередь пуста
         :return: удалённое значение
         """
-        value = self.peek()
+        entry = self._head_entry()
         # remove удаляет первое вхождение значения, то есть голову списка
-        self._items.remove(value)
-        return value
+        self._items.remove(entry)
+        return entry.value
 
     def peek(self):
         """Возвращает начало очереди, не удаляя его.
@@ -40,6 +47,9 @@ class Queue:
         :raises IndexError: очередь пуста
         :return: значение в начале
         """
+        return self._head_entry().value
+
+    def _head_entry(self) -> _QueueEntry:
         if self.is_empty():
             raise IndexError("очередь пуста")
         return self._items.head.value
