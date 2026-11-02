@@ -30,5 +30,58 @@ class TestQueue(unittest.TestCase):
             queue.peek()
 
 
+class TestQueueExtra(unittest.TestCase):
+    """Дополнительные тесты команды."""
+
+    def test_duplicates(self):
+        """Одинаковые значения выходят по одному, в порядке постановки."""
+        queue = Queue()
+        for value in (1, 2, 2, 1):
+            queue.enqueue(value)
+        self.assertEqual([queue.dequeue() for _ in range(4)], [1, 2, 2, 1])
+        self.assertTrue(queue.is_empty())
+
+    def test_interleaved(self):
+        """Постановка и извлечение вперемешку сохраняют порядок FIFO."""
+        queue = Queue()
+        queue.enqueue("a")
+        queue.enqueue("b")
+        self.assertEqual(queue.dequeue(), "a")
+        queue.enqueue("c")
+        self.assertEqual(len(queue), 2)
+        self.assertEqual(queue.dequeue(), "b")
+        self.assertEqual(queue.dequeue(), "c")
+        with self.assertRaises(IndexError):
+            queue.dequeue()
+
+    def test_reuse_after_empty(self):
+        """Опустевшая очередь снова принимает элементы."""
+        queue = Queue()
+        queue.enqueue(1)
+        queue.dequeue()
+        queue.enqueue(2)
+        self.assertEqual(queue.peek(), 2)
+        self.assertEqual(len(queue), 1)
+
+    def test_none_value(self):
+        """None хранится как обычное значение."""
+        queue = Queue()
+        queue.enqueue(None)
+        self.assertFalse(queue.is_empty())
+        self.assertIsNone(queue.peek())
+        self.assertIsNone(queue.dequeue())
+        self.assertTrue(queue.is_empty())
+
+    def test_many_elements(self):
+        """Очередь корректно работает с большим числом элементов."""
+        queue = Queue()
+        for i in range(1000):
+            queue.enqueue(i)
+        self.assertEqual(len(queue), 1000)
+        for i in range(1000):
+            self.assertEqual(queue.dequeue(), i)
+        self.assertTrue(queue.is_empty())
+
+
 if __name__ == "__main__":
     unittest.main()

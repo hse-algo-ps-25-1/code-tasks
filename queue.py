@@ -1,24 +1,27 @@
+from doubly_linked_list import DoublyLinkedList
+
+
 class Queue:
     """Структура данных Очередь"""
 
     def __init__(self):
         """Создаёт пустую очередь."""
-        pass
+        self._items = DoublyLinkedList()
 
     def is_empty(self) -> bool:
         """Возвращает True, если очередь пуста."""
-        pass
+        return len(self._items) == 0
 
     def __len__(self) -> int:
         """Возвращает число элементов."""
-        pass
+        return len(self._items)
 
     def enqueue(self, value):
         """Ставит элемент в конец очереди.
 
         :param value: новое значение
         """
-        pass
+        self._items.append(value)
 
     def dequeue(self):
         """Удаляет и возвращает элемент из начала очереди.
@@ -26,7 +29,10 @@ class Queue:
         :raises IndexError: очередь пуста
         :return: удалённое значение
         """
-        pass
+        value = self.peek()
+        # remove удаляет первое вхождение значения, то есть голову списка
+        self._items.remove(value)
+        return value
 
     def peek(self):
         """Возвращает начало очереди, не удаляя его.
@@ -34,4 +40,6 @@ class Queue:
         :raises IndexError: очередь пуста
         :return: значение в начале
         """
-        pass
+        if self.is_empty():
+            raise IndexError("очередь пуста")
+        return self._items.head.value
