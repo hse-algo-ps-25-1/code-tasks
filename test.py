@@ -1,7 +1,11 @@
 import math
 import unittest
 
-from main import generate_permutations_iter, generate_permutations_rec
+from main import (
+    NOT_LIST_ERROR_MSG,
+    generate_permutations_iter,
+    generate_permutations_rec,
+)
 
 PERMUTATION_FUNCTIONS = (generate_permutations_rec, generate_permutations_iter)
 
@@ -91,6 +95,37 @@ class TestPermutations(unittest.TestCase):
                 with self.subTest(function=function.__name__, invalid=invalid):
                     with self.assertRaises(TypeError):
                         function(invalid)
+
+    def test_count_is_factorial(self):
+        """Количество перестановок равно факториалу длины списка."""
+        for function in PERMUTATION_FUNCTIONS:
+            for n in range(7):
+                with self.subTest(function=function.__name__, n=n):
+                    elements = list(range(n))
+                    _assert_all_permutations(self, function(elements), elements)
+
+    def test_rec_and_iter_agree(self):
+        """Обе функции дают одинаковый набор перестановок."""
+        elements = ["a", "b", "c", "d", "e"]
+        rec = generate_permutations_rec(elements)
+        iter_ = generate_permutations_iter(elements)
+        self.assertEqual(sorted(rec), sorted(iter_))
+
+    def test_error_message(self):
+        """Текст ошибки для аргумента не-списка."""
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                with self.assertRaises(TypeError) as error:
+                    function((1, 2))
+                self.assertEqual(str(error.exception), NOT_LIST_ERROR_MSG)
+
+    def test_repeated_elements(self):
+        """Одинаковые элементы различаются по позициям: перестановок всё равно n!."""
+        elements = [1, 1, 2]
+        expected = [[1, 1, 2], [1, 1, 2], [1, 2, 1], [1, 2, 1], [2, 1, 1], [2, 1, 1]]
+        for function in PERMUTATION_FUNCTIONS:
+            with self.subTest(function=function.__name__):
+                self.assertEqual(sorted(function(elements)), expected)
 
 
 if __name__ == "__main__":
