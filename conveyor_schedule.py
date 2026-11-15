@@ -1,9 +1,6 @@
 from abstract_schedule import AbstractSchedule
-from errors import (
-    ScheduleArgumentError,
-    ErrorMessages,
-    ErrorTemplates,
-)
+from errors import ErrorMessages, ErrorTemplates, ScheduleArgumentError
+from schedule_item import ScheduleItem
 from staged_task import StagedTask
 
 
@@ -55,13 +52,44 @@ class ConveyorSchedule(AbstractSchedule):
     def __fill_schedule(self, tasks: list[StagedTask]) -> None:
         """Процедура составляет расписание из элементов ScheduleItem для каждого
         исполнителя, согласно алгоритму Джонсона."""
-        pass
+        first_schedule, second_schedule = self._executor_schedule
+        first_end = second_end = 0
+
+        for task in tasks:
+            first_duration, second_duration = task.stage_durations
+            first_item = ScheduleItem(task, first_end, first_duration)
+            first_schedule.append(first_item)
+            first_end = first_item.end
+
+            # Второй этап ждёт и завершения первого этапа, и исполнителя.
+            second_start = max(first_end, second_end)
+            if second_start > second_end:
+                second_schedule.append(
+                    ScheduleItem(None, second_end, second_start - second_end)
+                )
+            second_item = ScheduleItem(task, second_start, second_duration)
+            second_schedule.append(second_item)
+            second_end = second_item.end
+
+        if second_end > first_end:
+            first_schedule.append(ScheduleItem(None, first_end, second_end - first_end))
 
     @staticmethod
     def __sort_tasks(tasks: list[StagedTask]) -> list[StagedTask]:
         """Возвращает отсортированный список задач для применения
         алгоритма Джонсона."""
-        pass
+        early_tasks = []
+        late_tasks = []
+        for task in tasks:
+            first_duration, second_duration = task.stage_durations
+            if first_duration <= second_duration:
+                early_tasks.append(task)
+            else:
+                late_tasks.append(task)
+
+        early_tasks.sort(key=lambda task: task.stage_duration(0))
+        late_tasks.sort(key=lambda task: task.stage_duration(1), reverse=True)
+        return early_tasks + late_tasks
 
     @staticmethod
     def __validate_params(tasks: list[StagedTask]) -> None:

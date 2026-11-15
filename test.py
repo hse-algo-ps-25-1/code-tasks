@@ -144,6 +144,67 @@ class TestConveyorSchedule(unittest.TestCase):
         self.assertEqual(stage1_schedule, schedule.get_schedule_for_executor(0))
         self.assertEqual(stage2_schedule, schedule.get_schedule_for_executor(1))
 
+    def test_course_example(self):
+        """Сверяет порядок и интервалы с ручным решением задания 8."""
+        tasks = [
+            StagedTask("A", [2, 6]),
+            StagedTask("B", [10, 6]),
+            StagedTask("C", [7, 7]),
+            StagedTask("D", [4, 1]),
+            StagedTask("E", [3, 5]),
+            StagedTask("F", [15, 16]),
+            StagedTask("G", [5, 8]),
+            StagedTask("H", [8, 4]),
+            StagedTask("I", [12, 13]),
+        ]
+        schedule = ConveyorSchedule(tasks)
+        first_row = schedule.get_schedule_for_executor(0)
+        second_row = schedule.get_schedule_for_executor(1)
+        self.assertEqual(
+            tuple("ABCDEFGHI"), tuple(task.name for task in schedule.tasks)
+        )
+        self.assertEqual(list("AEGCIFBHD"), [item.task_name for item in first_row[:-1]])
+        self.assertEqual((66, 71), (first_row[-1].start, first_row[-1].end))
+        self.assertTrue(first_row[-1].is_downtime)
+        self.assertEqual(
+            [
+                ("downtime", 0, 2),
+                ("A", 2, 8),
+                ("E", 8, 13),
+                ("G", 13, 21),
+                ("C", 21, 28),
+                ("downtime", 28, 29),
+                ("I", 29, 42),
+                ("downtime", 42, 44),
+                ("F", 44, 60),
+                ("B", 60, 66),
+                ("H", 66, 70),
+                ("D", 70, 71),
+            ],
+            [(item.task_name, item.start, item.end) for item in second_row],
+        )
+        self.assertEqual(71, schedule.duration)
+
+    def test_equal_first_times_preserve_input_order(self):
+        """При равных ключах сохраняет исходный порядок двух разных задач."""
+        tasks = [StagedTask("B", [0.5, 1.5]), StagedTask("A", [0.5, 0.5])]
+        schedule = ConveyorSchedule(tasks)
+        self.assertEqual(
+            ("B", "A", "downtime"),
+            tuple(item.task_name for item in schedule.get_schedule_for_executor(0)),
+        )
+        self.assertEqual(2.5, schedule.duration)
+
+    def test_task_with_wrong_stage_count(self):
+        """Отклоняет задачу с одним или тремя этапами."""
+        for durations in ([1], [1, 1, 1]):
+            with self.subTest(durations=durations):
+                with self.assertRaises(ScheduleArgumentError) as error:
+                    ConveyorSchedule([StagedTask("a", durations)])
+                self.assertEqual(
+                    ErrorTemplates.INVALID_STAGE_CNT.format(0), str(error.exception)
+                )
+
 
 class TestTask(unittest.TestCase):
     name = "a"
@@ -351,7 +412,6 @@ class TestStagedTask(unittest.TestCase):
 
 
 class TestScheduleItem(unittest.TestCase):
-
     def test_init_not_number_start(self):
         """Проверяет выброс исключения при некорректном указании времени
         начала выполнения задачи - передано не число"""
