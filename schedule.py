@@ -1,4 +1,5 @@
 from abstract_schedule import AbstractSchedule
+from schedule_item import ScheduleItem
 from task import Task
 
 
@@ -51,10 +52,43 @@ class Schedule(AbstractSchedule):
 
     def __calculate_duration(self) -> float:
         """Вычисляет и возвращает минимальную продолжительность расписания"""
-        pass
+        avg_duration = sum(task.duration for task in self.tasks) / self.executor_count
+        max_duration = max(task.duration for task in self.tasks)
+        return max(avg_duration, max_duration)
 
     def __fill_schedule_for_each_executor(self) -> None:
         """Процедура составляет расписание из элементов ScheduleItem для каждого
         исполнителя, на основе исходного списка задач и общей продолжительности
         расписания."""
-        pass
+        executor_idx = 0
+        current_time = 0
+
+        for task in self.tasks:
+            if current_time + task.duration <= self.duration:
+                schedule_item = ScheduleItem(task, current_time, task.duration)
+                self._executor_schedule[executor_idx].append(schedule_item)
+                current_time += task.duration
+
+                if current_time == self.duration:
+                    executor_idx += 1
+                    current_time = 0
+            else:
+                first_part = self.duration - current_time
+                second_part = task.duration - first_part
+
+                first_schedule_item = ScheduleItem(task, current_time, first_part)
+                self._executor_schedule[executor_idx].append(first_schedule_item)
+
+                executor_idx += 1
+                second_schedule_item = ScheduleItem(task, 0, second_part)
+                self._executor_schedule[executor_idx].append(second_schedule_item)
+                current_time = second_part
+
+
+        while executor_idx < self.executor_count:
+            downtime_duration = self.duration - current_time
+            if downtime_duration > 0:
+                schedule_item = ScheduleItem(None, current_time, downtime_duration)
+                self._executor_schedule[executor_idx].append(schedule_item)
+            executor_idx += 1
+            current_time = 0

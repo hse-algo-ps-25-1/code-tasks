@@ -137,6 +137,102 @@ class TestSchedule(unittest.TestCase):
         self.assertCountEqual(executor1_schedule, schedule.get_schedule_for_executor(0))
         self.assertCountEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
 
+    def test_invalid_tasks_container_types(self):
+        """Проверяет выброс исключения при передаче кортежа, множества или
+        строки вместо списка задач."""
+        task_a = Task("a", 1)
+        incorrect_containers = [(task_a,), {task_a}, "tasks", 123]
+        for container in incorrect_containers:
+            with self.subTest(container=container):
+                with self.assertRaises(ScheduleArgumentError) as error:
+                    Schedule(container, 1)
+                self.assertEqual(ErrorMessages.TASKS_NOT_LIST, str(error.exception))
+
+    def test_invalid_executor_count_types(self):
+        """Проверяет выброс исключения при передаче не целого числа вместо
+        количества исполнителей."""
+        task_a = Task("a", 1)
+        incorrect_values = [None, 1.1, "str", [], True]
+        for value in incorrect_values:
+            with self.subTest(value=value):
+                with self.assertRaises(ScheduleArgumentError) as error:
+                    Schedule([task_a], value)
+                self.assertEqual(ErrorMessages.EXECUTOR_NOT_INT, str(error.exception))
+
+    def test_task_interruption_without_downtime(self):
+        """Проверяет прерывание задачи и перенос остатка на другого исполнителя,
+        когда средняя длительность больше максимальной и простоев нет."""
+        task_a = Task("a", 2)
+        task_b = Task("b", 2)
+        task_c = Task("c", 2)
+        schedule = Schedule([task_a, task_b, task_c], 2)
+
+        executor1_schedule = (
+            ScheduleItem(task_a, 0, 2),
+            ScheduleItem(task_b, 2, 1),
+        )
+        executor2_schedule = (
+            ScheduleItem(task_b, 0, 1),
+            ScheduleItem(task_c, 1, 2),
+        )
+
+        self.assertEqual(3.0, schedule.duration)
+        self.assertEqual(executor1_schedule, schedule.get_schedule_for_executor(0))
+        self.assertEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
+
+    def test_float_duration_task_interruption(self):
+        """Проверяет составление расписания с дробной общей длительностью
+        и разделением задачи на дробные части."""
+        task_a = Task("a", 1)
+        task_b = Task("b", 1)
+        task_c = Task("c", 1)
+        schedule = Schedule([task_a, task_b, task_c], 2)
+
+        executor1_schedule = (
+            ScheduleItem(task_a, 0, 1),
+            ScheduleItem(task_b, 1, 0.5),
+        )
+        executor2_schedule = (
+            ScheduleItem(task_b, 0, 0.5),
+            ScheduleItem(task_c, 0.5, 1),
+        )
+
+        self.assertEqual(1.5, schedule.duration)
+        self.assertEqual(executor1_schedule, schedule.get_schedule_for_executor(0))
+        self.assertEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
+
+    def test_interruption_with_partial_and_full_downtime(self):
+        """Проверяет расписание с прерыванием задачи, частичным простоем одного
+        исполнителя и полным простоем другого."""
+        task_a = Task("A", 12)
+        task_b = Task("B", 6)
+        task_c = Task("C", 5)
+        task_d = Task("D", 4)
+        task_e = Task("E", 3)
+        task_f = Task("F", 2)
+        tasks = [task_a, task_b, task_c, task_d, task_e, task_f]
+        schedule = Schedule(tasks, 4)
+
+        executor1_schedule = (ScheduleItem(task_a, 0, 12),)
+        executor2_schedule = (
+            ScheduleItem(task_b, 0, 6),
+            ScheduleItem(task_c, 6, 5),
+            ScheduleItem(task_d, 11, 1),
+        )
+        executor3_schedule = (
+            ScheduleItem(task_d, 0, 3),
+            ScheduleItem(task_e, 3, 3),
+            ScheduleItem(task_f, 6, 2),
+            ScheduleItem(None, 8, 4),
+        )
+        executor4_schedule = (ScheduleItem(None, 0, 12),)
+
+        self.assertEqual(12, schedule.duration)
+        self.assertEqual(executor1_schedule, schedule.get_schedule_for_executor(0))
+        self.assertEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
+        self.assertEqual(executor3_schedule, schedule.get_schedule_for_executor(2))
+        self.assertEqual(executor4_schedule, schedule.get_schedule_for_executor(3))
+
 
 class TestTask(unittest.TestCase):
     name = "a"
