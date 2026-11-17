@@ -62,14 +62,15 @@ class Schedule(AbstractSchedule):
         расписания."""
         executor_idx = 0
         current_time = 0
+        error = self.duration * 1e-9
 
         for task in self.tasks:
-            if current_time + task.duration <= self.duration:
+            if current_time + task.duration <= self.duration + error:
                 schedule_item = ScheduleItem(task, current_time, task.duration)
                 self._executor_schedule[executor_idx].append(schedule_item)
                 current_time += task.duration
 
-                if current_time == self.duration:
+                if self.duration - current_time <= error:
                     executor_idx += 1
                     current_time = 0
             else:
@@ -87,7 +88,7 @@ class Schedule(AbstractSchedule):
 
         while executor_idx < self.executor_count:
             downtime_duration = self.duration - current_time
-            if downtime_duration > 0:
+            if downtime_duration > error:
                 schedule_item = ScheduleItem(None, current_time, downtime_duration)
                 self._executor_schedule[executor_idx].append(schedule_item)
             executor_idx += 1
