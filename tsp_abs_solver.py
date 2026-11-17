@@ -36,13 +36,23 @@ class AbstractTspSolver(ABC):
 
     def get_distance(
         self, dist_matrix: list[list[NullableNumber]], path: list[int]
-    ) -> float:
+    ) -> NullableNumber:
         """Возвращает суммарную длину маршрута по последовательным рёбрам.
 
         :param dist_matrix: матрица расстояний
         :param path: вершины маршрута
         """
-        pass
+        if len(path) <= 1:
+            return 0
+
+        total_distance = 0
+        for i in range(len(path) - 1):
+            weight = dist_matrix[path[i]][path[i + 1]]
+            if weight is None:
+                return None
+            total_distance += weight
+
+        return total_distance
 
     def _validate_params(self, matrix: list[list[NullableNumber]]) -> None:
         """Проверяет, что матрица прямоугольная и длины рёбер неотрицательны."""
