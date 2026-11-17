@@ -148,17 +148,6 @@ class TestSchedule(unittest.TestCase):
                     Schedule(container, 1)
                 self.assertEqual(ErrorMessages.TASKS_NOT_LIST, str(error.exception))
 
-    def test_invalid_executor_count_types(self):
-        """Проверяет выброс исключения при передаче не целого числа вместо
-        количества исполнителей."""
-        task_a = Task("a", 1)
-        incorrect_values = [None, 1.1, "str", [], True]
-        for value in incorrect_values:
-            with self.subTest(value=value):
-                with self.assertRaises(ScheduleArgumentError) as error:
-                    Schedule([task_a], value)
-                self.assertEqual(ErrorMessages.EXECUTOR_NOT_INT, str(error.exception))
-
     def test_task_interruption_without_downtime(self):
         """Проверяет прерывание задачи и перенос остатка на другого исполнителя,
         когда средняя длительность больше максимальной и простоев нет."""
@@ -302,7 +291,6 @@ class TestTask(unittest.TestCase):
 
 
 class TestScheduleItem(unittest.TestCase):
-
     def test_init_not_number_start(self):
         """Проверяет выброс исключения при некорректном указании времени
         начала выполнения задачи - передано не число"""

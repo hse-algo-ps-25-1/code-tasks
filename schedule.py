@@ -85,7 +85,6 @@ class Schedule(AbstractSchedule):
                 self._executor_schedule[executor_idx].append(second_schedule_item)
                 current_time = second_part
 
-
         while executor_idx < self.executor_count:
             downtime_duration = self.duration - current_time
             if downtime_duration > error:
