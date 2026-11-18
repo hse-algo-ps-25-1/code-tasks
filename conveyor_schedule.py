@@ -1,9 +1,10 @@
 from abstract_schedule import AbstractSchedule
 from errors import (
-    ScheduleArgumentError,
     ErrorMessages,
     ErrorTemplates,
+    ScheduleArgumentError,
 )
+from schedule_item import ScheduleItem
 from staged_task import StagedTask
 
 
@@ -55,13 +56,42 @@ class ConveyorSchedule(AbstractSchedule):
     def __fill_schedule(self, tasks: list[StagedTask]) -> None:
         """Процедура составляет расписание из элементов ScheduleItem для каждого
         исполнителя, согласно алгоритму Джонсона."""
-        pass
+        first_schedule, second_schedule = self._executor_schedule
+        first_end = 0
+        second_end = 0
+
+        for task in tasks:
+            first_duration, second_duration = task.stage_durations
+            first_schedule.append(ScheduleItem(task, first_end, first_duration))
+            first_end += first_duration
+
+            second_start = max(first_end, second_end)
+            if second_start > second_end:
+                second_schedule.append(
+                    ScheduleItem(None, second_end, second_start - second_end)
+                )
+            second_schedule.append(ScheduleItem(task, second_start, second_duration))
+            second_end = second_start + second_duration
+
+        if first_end < second_end:
+            first_schedule.append(ScheduleItem(None, first_end, second_end - first_end))
 
     @staticmethod
     def __sort_tasks(tasks: list[StagedTask]) -> list[StagedTask]:
         """Возвращает отсортированный список задач для применения
         алгоритма Джонсона."""
-        pass
+        first_group = []
+        second_group = []
+        for task in tasks:
+            first_duration, second_duration = task.stage_durations
+            if first_duration <= second_duration:
+                first_group.append(task)
+            else:
+                second_group.append(task)
+
+        first_group.sort(key=lambda task: task.stage_duration(0))
+        second_group.sort(key=lambda task: task.stage_duration(1), reverse=True)
+        return first_group + second_group
 
     @staticmethod
     def __validate_params(tasks: list[StagedTask]) -> None:

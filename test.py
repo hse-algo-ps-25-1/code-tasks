@@ -144,6 +144,67 @@ class TestConveyorSchedule(unittest.TestCase):
         self.assertEqual(stage1_schedule, schedule.get_schedule_for_executor(0))
         self.assertEqual(stage2_schedule, schedule.get_schedule_for_executor(1))
 
+    def test_schedule_with_several_downtimes(self):
+        """Проверяет расписание для двух групп задач с несколькими простоями."""
+        task_a = StagedTask("a", [9, 11])
+        task_b = StagedTask("b", [2, 3])
+        task_c = StagedTask("c", [8, 6])
+        task_d = StagedTask("d", [1, 4])
+        task_e = StagedTask("e", [4, 1])
+        task_f = StagedTask("f", [5, 7])
+        task_g = StagedTask("g", [7, 4])
+        task_h = StagedTask("h", [13, 14])
+        schedule = ConveyorSchedule(
+            [task_a, task_b, task_c, task_d, task_e, task_f, task_g, task_h]
+        )
+        stage1_schedule = (
+            ScheduleItem(task_d, 0, 1),
+            ScheduleItem(task_b, 1, 2),
+            ScheduleItem(task_f, 3, 5),
+            ScheduleItem(task_a, 8, 9),
+            ScheduleItem(task_h, 17, 13),
+            ScheduleItem(task_c, 30, 8),
+            ScheduleItem(task_g, 38, 7),
+            ScheduleItem(task_e, 45, 4),
+            ScheduleItem(None, 49, 6),
+        )
+        stage2_schedule = (
+            ScheduleItem(None, 0, 1),
+            ScheduleItem(task_d, 1, 4),
+            ScheduleItem(task_b, 5, 3),
+            ScheduleItem(task_f, 8, 7),
+            ScheduleItem(None, 15, 2),
+            ScheduleItem(task_a, 17, 11),
+            ScheduleItem(None, 28, 2),
+            ScheduleItem(task_h, 30, 14),
+            ScheduleItem(task_c, 44, 6),
+            ScheduleItem(task_g, 50, 4),
+            ScheduleItem(task_e, 54, 1),
+        )
+        self.assertEqual(55, schedule.duration)
+        self.assertEqual(stage1_schedule, schedule.get_schedule_for_executor(0))
+        self.assertEqual(stage2_schedule, schedule.get_schedule_for_executor(1))
+
+    def test_schedule_with_fractional_durations(self):
+        """Проверяет расписание с дробными длительностями этапов."""
+        task_a = StagedTask("a", [1.5, 0.5])
+        task_b = StagedTask("b", [2.5, 1.0])
+        schedule = ConveyorSchedule([task_a, task_b])
+        stage1_schedule = (
+            ScheduleItem(task_b, 0, 2.5),
+            ScheduleItem(task_a, 2.5, 1.5),
+            ScheduleItem(None, 4.0, 0.5),
+        )
+        stage2_schedule = (
+            ScheduleItem(None, 0, 2.5),
+            ScheduleItem(task_b, 2.5, 1.0),
+            ScheduleItem(None, 3.5, 0.5),
+            ScheduleItem(task_a, 4.0, 0.5),
+        )
+        self.assertEqual(4.5, schedule.duration)
+        self.assertEqual(stage1_schedule, schedule.get_schedule_for_executor(0))
+        self.assertEqual(stage2_schedule, schedule.get_schedule_for_executor(1))
+
 
 class TestTask(unittest.TestCase):
     name = "a"
