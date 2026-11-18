@@ -206,7 +206,6 @@ class TestTask(unittest.TestCase):
 
 
 class TestScheduleItem(unittest.TestCase):
-
     def test_init_not_number_start(self):
         """Проверяет выброс исключения при некорректном указании времени
         начала выполнения задачи - передано не число"""
@@ -283,6 +282,130 @@ class TestScheduleItem(unittest.TestCase):
         item = ScheduleItem(None, start, duration)
         str_item = SCHEDULE_ITEM_DOWNTIME_STR_TEMPL.format(start, start + duration)
         self.assertEqual(str_item, str(item))
+
+
+class TestTapeSchedule(unittest.TestCase):
+    """Дополнительные примеры ленточного расписания"""
+
+    @staticmethod
+    def rows(schedule):
+        return [
+            [
+                (item.task_name, item.start, item.end)
+                for item in schedule.get_schedule_for_executor(executor_idx)
+            ]
+            for executor_idx in range(schedule.executor_count)
+        ]
+
+    def test_lecture_example_one(self):
+        """Проверяет T_opt = 9 и прерывание задач c и e"""
+        tasks = [
+            Task("a", 5),
+            Task("b", 2),
+            Task("c", 4),
+            Task("d", 3),
+            Task("e", 7),
+            Task("f", 6),
+        ]
+        schedule = Schedule(tasks, 3)
+
+        self.assertEqual(schedule.duration, 9)
+        self.assertEqual(
+            self.rows(schedule),
+            [
+                [("a", 0, 5), ("b", 5, 7), ("c", 7, 9)],
+                [("c", 0, 2), ("d", 2, 5), ("e", 5, 9)],
+                [("e", 0, 3), ("f", 3, 9)],
+            ],
+        )
+
+    def test_lecture_example_two(self):
+        """Проверяет длинную задачу, T_opt = 13 и простой третьего исполнителя"""
+        tasks = [
+            Task("a", 5),
+            Task("b", 2),
+            Task("c", 4),
+            Task("d", 3),
+            Task("e", 13),
+            Task("f", 6),
+        ]
+        schedule = Schedule(tasks, 3)
+
+        self.assertEqual(schedule.duration, 13)
+        self.assertEqual(
+            self.rows(schedule),
+            [
+                [("a", 0, 5), ("b", 5, 7), ("c", 7, 11), ("d", 11, 13)],
+                [("d", 0, 1), ("e", 1, 13)],
+                [("e", 0, 1), ("f", 1, 7), ("downtime", 7, 13)],
+            ],
+        )
+
+    def test_single_task_many_executors(self):
+        """Проверяет полный простой исполнителей без задач"""
+        schedule = Schedule([Task("a", 2)], 3)
+
+        self.assertEqual(schedule.duration, 2)
+        self.assertEqual(
+            self.rows(schedule),
+            [
+                [("a", 0, 2)],
+                [("downtime", 0, 2)],
+                [("downtime", 0, 2)],
+            ],
+        )
+
+    def test_single_executor_sequence(self):
+        """Проверяет последовательное выполнение задач при одном исполнителе"""
+        schedule = Schedule([Task("a", 2), Task("b", 1)], 1)
+
+        self.assertEqual(schedule.duration, 3)
+        self.assertEqual(
+            self.rows(schedule),
+            [[("a", 0, 2), ("b", 2, 3)]],
+        )
+
+    def test_long_task_defines_horizon(self):
+        """Проверяет, что продолжительность расписания задаёт самая длинная задача"""
+        schedule = Schedule([Task("a", 13), Task("b", 1), Task("c", 2)], 3)
+
+        self.assertEqual(schedule.duration, 13)
+        self.assertEqual(
+            self.rows(schedule),
+            [
+                [("a", 0, 13)],
+                [("b", 0, 1), ("c", 1, 3), ("downtime", 3, 13)],
+                [("downtime", 0, 13)],
+            ],
+        )
+
+    def test_task_ends_at_window_boundary(self):
+        """Проверяет задачу, заканчивающуюся ровно на границе окна"""
+        schedule = Schedule([Task("a", 1), Task("b", 2), Task("c", 1)], 2)
+
+        self.assertEqual(schedule.duration, 2)
+        self.assertEqual(
+            self.rows(schedule),
+            [
+                [("a", 0, 1), ("b", 1, 2)],
+                [("b", 0, 1), ("c", 1, 2)],
+            ],
+        )
+
+    def test_float_durations(self):
+        """Проверяет вещественные длительности и сохранение суммы фрагментов"""
+        tasks = [Task("a", 0.3), Task("b", 0.3), Task("c", 0.3)]
+        schedule = Schedule(tasks, 2)
+
+        self.assertAlmostEqual(schedule.duration, 0.45)
+        for task in tasks:
+            total = sum(
+                item.duration
+                for executor_idx in range(2)
+                for item in schedule.get_schedule_for_executor(executor_idx)
+                if not item.is_downtime and item.task_name == task.name
+            )
+            self.assertAlmostEqual(total, task.duration)
 
 
 if __name__ == "__main__":
