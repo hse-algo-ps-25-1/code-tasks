@@ -143,6 +143,82 @@ class TestConveyorSchedule(unittest.TestCase):
         self.assertEqual(6, schedule.duration)
         self.assertEqual(stage1_schedule, schedule.get_schedule_for_executor(0))
         self.assertEqual(stage2_schedule, schedule.get_schedule_for_executor(1))
+        
+    def test_several_tasks_in_both_groups(self):
+        a = StagedTask("a", [3, 4])
+        b = StagedTask("b", [5, 1])
+        c = StagedTask("c", [1, 6])
+        d = StagedTask("d", [6, 2])
+
+        schedule = ConveyorSchedule([a, b, c, d])
+
+        expected_0 = (
+            ScheduleItem(c, 0, 1),
+            ScheduleItem(a, 1, 3),
+            ScheduleItem(d, 4, 6),
+            ScheduleItem(b, 10, 5),
+            ScheduleItem(None, 15, 1),
+        )
+        expected_1 = (
+            ScheduleItem(None, 0, 1),
+            ScheduleItem(c, 1, 6),
+            ScheduleItem(a, 7, 4),
+            ScheduleItem(d, 11, 2),
+            ScheduleItem(None, 13, 2),
+            ScheduleItem(b, 15, 1),
+        )
+
+        self.assertEqual(expected_0, schedule.get_schedule_for_executor(0))
+        self.assertEqual(expected_1, schedule.get_schedule_for_executor(1))
+        self.assertEqual(16, schedule.duration)
+
+    def test_schedule_with_fractional_durations(self):
+        a = StagedTask("a", [1.5, 0.5])
+        b = StagedTask("b", [0.5, 1.0])
+
+        schedule = ConveyorSchedule([a, b])
+
+        expected_0 = (
+            ScheduleItem(b, 0, 0.5),
+            ScheduleItem(a, 0.5, 1.5),
+            ScheduleItem(None, 2, 0.5),
+        )
+        expected_1 = (
+            ScheduleItem(None, 0, 0.5),
+            ScheduleItem(b, 0.5, 1.0),
+            ScheduleItem(None, 1.5, 0.5),
+            ScheduleItem(a, 2, 0.5),
+        )
+
+        self.assertEqual(expected_0, schedule.get_schedule_for_executor(0))
+        self.assertEqual(expected_1, schedule.get_schedule_for_executor(1))
+        self.assertEqual(2.5, schedule.duration)
+
+    def test_multiple_downtimes_for_second_executor(self):
+        a = StagedTask("a", [3, 1])
+        b = StagedTask("b", [5, 2])
+        c = StagedTask("c", [7, 4])
+
+        schedule = ConveyorSchedule([a, b, c])
+
+        expected_0 = (
+            ScheduleItem(c, 0, 7),
+            ScheduleItem(b, 7, 5),
+            ScheduleItem(a, 12, 3),
+            ScheduleItem(None, 15, 1),
+        )
+        expected_1 = (
+            ScheduleItem(None, 0, 7),
+            ScheduleItem(c, 7, 4),
+            ScheduleItem(None, 11, 1),
+            ScheduleItem(b, 12, 2),
+            ScheduleItem(None, 14, 1),
+            ScheduleItem(a, 15, 1),
+        )
+
+        self.assertEqual(expected_0, schedule.get_schedule_for_executor(0))
+        self.assertEqual(expected_1, schedule.get_schedule_for_executor(1))
+        self.assertEqual(16, schedule.duration)
 
 
 class TestTask(unittest.TestCase):
@@ -428,6 +504,33 @@ class TestScheduleItem(unittest.TestCase):
         item = ScheduleItem(None, start, duration)
         str_item = SCHEDULE_ITEM_DOWNTIME_STR_TEMPL.format(start, start + duration)
         self.assertEqual(str_item, str(item))
+        
+
+    def test_task_float_duration(self):
+        task = Task("a", 1.5)
+        self.assertEqual(1.5, task.duration)
+
+    def test_task_different_names(self):
+        task1 = Task("a", 1)
+        task2 = Task("b", 1)
+        self.assertNotEqual(task1, task2)
+
+    def test_init_integer_start_float_duration(self):
+        start = 2
+        duration = 0.5
+        item = ScheduleItem(None, start, duration)
+        self.assertEqual(start, item.start)
+        self.assertEqual(duration, item.duration)
+        self.assertEqual(start + duration, item.end)
+
+    def test_init_float_start_integer_duration(self):
+        start = 1.5
+        duration = 2
+        item = ScheduleItem(None, start, duration)
+        self.assertEqual(start, item.start)
+        self.assertEqual(duration, item.duration)
+        self.assertEqual(start + duration, item.end)
+
 
 
 if __name__ == "__main__":
