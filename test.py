@@ -57,6 +57,28 @@ class TestPermutationGenerator(unittest.TestCase):
         with self.assertRaises(TypeError):
             generate_permutations("789")
 
+    def test_wrong_types_various(self):
+        """Не список (в том числе bool, кортеж, int, None) даёт TypeError"""
+        for invalid in [True, False, (1, 2), 123, None, {"a": 1}]:
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(TypeError):
+                    generate_permutations(invalid)
+
+    def test_strings_lexicographical(self):
+        """Сравнимые строковые элементы упорядочиваются лексикографически"""
+        assert_lex(
+            self,
+            ["c", "a", "b"],
+            [
+                ["a", "b", "c"],
+                ["a", "c", "b"],
+                ["b", "a", "c"],
+                ["b", "c", "a"],
+                ["c", "a", "b"],
+                ["c", "b", "a"],
+            ],
+        )
+
 
 class TestTsp(unittest.TestCase):
     """Примеры полного перебора коммивояжёра"""
@@ -70,6 +92,36 @@ class TestTsp(unittest.TestCase):
             None,
         )
 
+    def test_non_square_matrix(self):
+        """Непрямоугольная матрица даёт TypeError"""
+        matrix = [[None, 1.0, 2.0], [1.0, None]]
+        self.assertRaisesRegex(
+            TypeError,
+            ErrorMessageEnum.WRONG_MATRIX,
+            BruteForceTspSolver,
+            matrix,
+        )
+
+    def test_invalid_matrix_element(self):
+        """Матрица с нечисловыми значениями даёт TypeError"""
+        matrix = [[None, "invalid"], [1.0, None]]
+        self.assertRaisesRegex(
+            TypeError,
+            ErrorMessageEnum.WRONG_MATRIX,
+            BruteForceTspSolver,
+            matrix,
+        )
+
+    def test_negative_distance(self):
+        """Отрицательное расстояние даёт ValueError"""
+        matrix = [[None, -1.0], [1.0, None]]
+        self.assertRaisesRegex(
+            ValueError,
+            ErrorMessageEnum.NEG_VALUE,
+            BruteForceTspSolver,
+            matrix,
+        )
+
     def test_single(self):
         """Один город уже является маршрутом длины 0"""
         solver = BruteForceTspSolver([[None]])
@@ -81,6 +133,12 @@ class TestTsp(unittest.TestCase):
         solver = BruteForceTspSolver(matrix)
         self.assertEqual(solver.get_distance(matrix, [0, 1, 0]), 3)
         self.assertEqual(solver.get_distance([[None]], [0]), 0)
+
+    def test_distance_missing_edge(self):
+        """Отсутствующее ребро в маршруте даёт расстояние None"""
+        matrix = [[None, 1.0], [None, None]]
+        solver = BruteForceTspSolver(matrix)
+        self.assertIsNone(solver.get_distance(matrix, [0, 1, 0]))
 
     def test_double(self):
         """Два города: маршрут возвращается в начало"""
