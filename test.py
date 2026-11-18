@@ -137,6 +137,147 @@ class TestSchedule(unittest.TestCase):
         self.assertCountEqual(executor1_schedule, schedule.get_schedule_for_executor(0))
         self.assertCountEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
 
+    def test_average_duration(self):
+        """когда средняя загрузка больше самой длинной задачи"""
+        tasks = [Task("a", 3), Task("b", 4), Task("c", 5)]
+        schedule = Schedule(tasks, 2)
+        self.assertEqual(6, schedule.duration)
+
+    def test_split_task(self):
+        """задача на границе ленты разбивается на две части"""
+        a = Task("a", 5)
+        b = Task("b", 2)
+        c = Task("c", 4)
+        schedule = Schedule([a, b, c], 2)
+
+        self.assertEqual(5.5, schedule.duration)
+        self.assertEqual(
+            (ScheduleItem(a, 0, 5), ScheduleItem(b, 5, 0.5)),
+            schedule.get_schedule_for_executor(0),
+        )
+        self.assertEqual(
+            (ScheduleItem(b, 0, 1.5), ScheduleItem(c, 1.5, 4)),
+            schedule.get_schedule_for_executor(1),
+        )
+
+    def test_multiple_splits(self):
+        """проверяет несколько разрезов задач"""
+        a = Task("a", 3)
+        b = Task("b", 7)
+        c = Task("c", 2)
+        d = Task("d", 6)
+        schedule = Schedule([a, b, c, d], 3)
+
+        self.assertEqual(7, schedule.duration)
+        self.assertEqual(
+            (ScheduleItem(a, 0, 3), ScheduleItem(b, 3, 4)),
+            schedule.get_schedule_for_executor(0),
+        )
+        self.assertEqual(
+            (ScheduleItem(b, 0, 3), ScheduleItem(c, 3, 2), ScheduleItem(d, 5, 2)),
+            schedule.get_schedule_for_executor(1),
+        )
+        self.assertEqual(
+            (ScheduleItem(d, 0, 4), ScheduleItem(None, 4, 3)),
+            schedule.get_schedule_for_executor(2),
+        )
+
+    def test_unused_executors(self):
+        """лишние исполнители простаивают всё время"""
+        a = Task("a", 10)
+        b = Task("b", 4)
+        schedule = Schedule([a, b], 4)
+
+        self.assertEqual(10, schedule.duration)
+        self.assertEqual(
+            (ScheduleItem(a, 0, 10),),
+            schedule.get_schedule_for_executor(0),
+        )
+        self.assertEqual(
+            (ScheduleItem(b, 0, 4), ScheduleItem(None, 4, 6)),
+            schedule.get_schedule_for_executor(1),
+        )
+        for idx in (2, 3):
+            with self.subTest(executor=idx):
+                self.assertEqual(
+                    (ScheduleItem(None, 0, 10),),
+                    schedule.get_schedule_for_executor(idx),
+                )
+
+    def test_float_durations(self):
+        """проверяет задачи с дробной длительностью"""
+        a = Task("a", 0.5)
+        b = Task("b", 0.75)
+        c = Task("c", 0.25)
+        schedule = Schedule([a, b, c], 2)
+
+        self.assertEqual(0.75, schedule.duration)
+        self.assertEqual(
+            (ScheduleItem(a, 0, 0.5), ScheduleItem(b, 0.5, 0.25)),
+            schedule.get_schedule_for_executor(0),
+        )
+        self.assertEqual(
+            (ScheduleItem(b, 0, 0.5), ScheduleItem(c, 0.5, 0.25)),
+            schedule.get_schedule_for_executor(1),
+        )
+
+    def test_full_time_window(self):
+        """всё время исполнителя занято работой или простоем"""
+        tasks = [Task("a", 12), Task("b", 4), Task("c", 1)]
+        schedule = Schedule(tasks, 5)
+
+        for executor in range(schedule.executor_count):
+            items = schedule.get_schedule_for_executor(executor)
+            current_time = 0
+            for item in items:
+                self.assertGreater(item.duration, 0)
+                self.assertAlmostEqual(current_time, item.start)
+                current_time = item.end
+            self.assertAlmostEqual(schedule.duration, current_time)
+
+    def test_no_overlaps(self):
+        """задача не должна выполняться одновременно двумя исполнителями"""
+        tasks = [Task("a", 3), Task("b", 7), Task("c", 2), Task("d", 6)]
+        schedule = Schedule(tasks, 3)
+
+        for task in tasks:
+            parts = [
+                item
+                for executor in range(schedule.executor_count)
+                for item in schedule.get_schedule_for_executor(executor)
+                if not item.is_downtime and item.task_name == task.name
+            ]
+            self.assertAlmostEqual(
+                task.duration,
+                sum(item.duration for item in parts),
+            )
+            for i, first in enumerate(parts):
+                for second in parts[i + 1 :]:
+                    self.assertTrue(
+                        first.end <= second.start or second.end <= first.start,
+                        msg=f"Задача {task.name} выполняется одновременно",
+                    )
+
+    def test_task_order(self):
+        """задачи должны сохранять исходный порядок"""
+        a = Task("a", 2)
+        b = Task("b", 3)
+        c = Task("c", 4)
+        d = Task("d", 1)
+        tasks = [a, b, c, d]
+        schedule = Schedule(tasks, 2)
+
+        self.assertEqual(tuple(tasks), schedule.tasks)
+        self.assertEqual(5, schedule.duration)
+        self.assertEqual(
+            (ScheduleItem(a, 0, 2), ScheduleItem(b, 2, 3)),
+            schedule.get_schedule_for_executor(0),
+        )
+        self.assertEqual(
+            (ScheduleItem(c, 0, 4), ScheduleItem(d, 4, 1)),
+            schedule.get_schedule_for_executor(1),
+        )
+
 
 class TestTask(unittest.TestCase):
     name = "a"
@@ -206,7 +347,6 @@ class TestTask(unittest.TestCase):
 
 
 class TestScheduleItem(unittest.TestCase):
-
     def test_init_not_number_start(self):
         """Проверяет выброс исключения при некорректном указании времени
         начала выполнения задачи - передано не число"""
