@@ -1,4 +1,7 @@
+from fractions import Fraction
+
 from abstract_schedule import AbstractSchedule
+from schedule_item import ScheduleItem
 from task import Task
 
 
@@ -51,10 +54,39 @@ class Schedule(AbstractSchedule):
 
     def __calculate_duration(self) -> float:
         """Вычисляет и возвращает минимальную продолжительность расписания"""
-        pass
+        total = Fraction(0)
+        longest = Fraction(0)
+        for task in self._tasks:
+            duration = Fraction(str(task.duration))
+            total += duration
+            longest = max(longest, duration)
+
+        # Для разрезов сохраняем точную длину окна, даже если это, например, 4/3.
+        self._window = max(longest, total / self.executor_count)
+        return float(self._window)
 
     def __fill_schedule_for_each_executor(self) -> None:
         """Процедура составляет расписание из элементов ScheduleItem для каждого
         исполнителя, на основе исходного списка задач и общей продолжительности
         расписания."""
-        pass
+        executor_idx = 0
+        start = Fraction(0)
+        for task in self._tasks:
+            remaining = Fraction(str(task.duration))
+            while remaining > 0:
+                length = min(remaining, self._window - start)
+                self._executor_schedule[executor_idx].append(
+                    ScheduleItem(task, float(start), float(length))
+                )
+                remaining -= length
+                start += length
+                if start == self._window:
+                    executor_idx += 1
+                    start = Fraction(0)
+
+        # Дополняем последнее занятое окно и все целиком свободные окна.
+        for idx in range(executor_idx, self.executor_count):
+            self._executor_schedule[idx].append(
+                ScheduleItem(None, float(start), float(self._window - start))
+            )
+            start = Fraction(0)

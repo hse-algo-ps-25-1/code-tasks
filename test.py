@@ -138,6 +138,97 @@ class TestSchedule(unittest.TestCase):
         self.assertCountEqual(executor2_schedule, schedule.get_schedule_for_executor(1))
 
 
+class TestRibbonSchedule(unittest.TestCase):
+    def test_split_at_fractional_boundary(self):
+        a, b, c = Task("a", 3), Task("b", 2), Task("c", 2)
+        schedule = Schedule([a, b, c], 2)
+
+        self.assertEqual(schedule.duration, 3.5)
+        self.assertEqual(
+            schedule.get_schedule_for_executor(0),
+            (ScheduleItem(a, 0, 3), ScheduleItem(b, 3, 0.5)),
+        )
+        self.assertEqual(
+            schedule.get_schedule_for_executor(1),
+            (ScheduleItem(b, 0, 1.5), ScheduleItem(c, 1.5, 2)),
+        )
+
+    def test_two_different_tasks_cross_boundaries(self):
+        a, b, c, d = [Task(name, 3) for name in "abcd"]
+        schedule = Schedule([a, b, c, d], 3)
+
+        self.assertEqual(schedule.duration, 4)
+        expected = (
+            (ScheduleItem(a, 0, 3), ScheduleItem(b, 3, 1)),
+            (ScheduleItem(b, 0, 2), ScheduleItem(c, 2, 2)),
+            (ScheduleItem(c, 0, 1), ScheduleItem(d, 1, 3)),
+        )
+        for idx, row in enumerate(expected):
+            with self.subTest(executor=idx):
+                self.assertEqual(schedule.get_schedule_for_executor(idx), row)
+
+    def test_task_ends_exactly_at_boundary(self):
+        a, b, c = Task("a", 2), Task("b", 3), Task("c", 5)
+        schedule = Schedule([a, b, c], 2)
+
+        self.assertEqual(
+            schedule.get_schedule_for_executor(0),
+            (ScheduleItem(a, 0, 2), ScheduleItem(b, 2, 3)),
+        )
+        self.assertEqual(
+            schedule.get_schedule_for_executor(1), (ScheduleItem(c, 0, 5),)
+        )
+
+    def test_partial_and_full_downtime(self):
+        a, b, c = Task("a", 6), Task("b", 2), Task("c", 1)
+        schedule = Schedule([a, b, c], 4)
+
+        self.assertEqual(schedule.duration, 6)
+        self.assertEqual(
+            schedule.get_schedule_for_executor(0), (ScheduleItem(a, 0, 6),)
+        )
+        self.assertEqual(
+            schedule.get_schedule_for_executor(1),
+            (ScheduleItem(b, 0, 2), ScheduleItem(c, 2, 1), ScheduleItem(None, 3, 3)),
+        )
+        for idx in (2, 3):
+            with self.subTest(executor=idx):
+                self.assertEqual(
+                    schedule.get_schedule_for_executor(idx), (ScheduleItem(None, 0, 6),)
+                )
+
+    def test_decimal_lengths_at_exact_boundary(self):
+        a, b, c = Task("a", 0.1), Task("b", 0.2), Task("c", 0.3)
+        schedule = Schedule([a, b, c], 2)
+
+        self.assertAlmostEqual(schedule.duration, 0.3)
+        self.assertEqual(
+            schedule.get_schedule_for_executor(0),
+            (ScheduleItem(a, 0, 0.1), ScheduleItem(b, 0.1, 0.2)),
+        )
+        self.assertEqual(
+            schedule.get_schedule_for_executor(1), (ScheduleItem(c, 0, 0.3),)
+        )
+
+    def test_window_length_is_a_recurring_fraction(self):
+        schedule = Schedule([Task(name, 1) for name in "abcd"], 3)
+
+        self.assertAlmostEqual(schedule.duration, 4 / 3)
+        expected = (
+            (("a", 0, 1), ("b", 1, 1 / 3)),
+            (("b", 0, 2 / 3), ("c", 2 / 3, 2 / 3)),
+            (("c", 0, 1 / 3), ("d", 1 / 3, 1)),
+        )
+        for idx, expected_row in enumerate(expected):
+            with self.subTest(executor=idx):
+                row = schedule.get_schedule_for_executor(idx)
+                self.assertEqual(len(row), len(expected_row))
+                for item, (name, start, length) in zip(row, expected_row):
+                    self.assertEqual(item.task_name, name)
+                    self.assertAlmostEqual(item.start, start)
+                    self.assertAlmostEqual(item.duration, length)
+
+
 class TestTask(unittest.TestCase):
     name = "a"
     duration = 1
