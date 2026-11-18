@@ -1,4 +1,5 @@
 from abstract_schedule import AbstractSchedule
+from schedule_item import ScheduleItem
 from errors import (
     ScheduleArgumentError,
     ErrorMessages,
@@ -55,13 +56,48 @@ class ConveyorSchedule(AbstractSchedule):
     def __fill_schedule(self, tasks: list[StagedTask]) -> None:
         """Процедура составляет расписание из элементов ScheduleItem для каждого
         исполнителя, согласно алгоритму Джонсона."""
-        pass
+        time_0 = 0
+        time_1 = 0
+        sched_0, sched_1 = self._executor_schedule
+
+        for task in tasks:
+            d0 = task.stage_duration(0)
+            d1 = task.stage_duration(1)
+
+            item_0 = ScheduleItem(task, time_0, d0)
+            sched_0.append(item_0)
+            time_0 = item_0.end
+
+            if time_0 > time_1:
+                sched_1.append(ScheduleItem(None, time_1, time_0 - time_1))
+                time_1 = time_0
+
+            item_1 = ScheduleItem(task, time_1, d1)
+            sched_1.append(item_1)
+            time_1 = item_1.end
+
+        if time_1 > time_0:
+            sched_0.append(ScheduleItem(None, time_0, time_1 - time_0))
 
     @staticmethod
     def __sort_tasks(tasks: list[StagedTask]) -> list[StagedTask]:
         """Возвращает отсортированный список задач для применения
         алгоритма Джонсона."""
-        pass
+        left = []
+        right = []
+
+        ordered = sorted(
+            tasks,
+            key=lambda t: min(t.stage_duration(0), t.stage_duration(1))
+        )
+
+        for task in ordered:
+            if task.stage_duration(0) <= task.stage_duration(1):
+                left.append(task)
+            else:
+                right.append(task)
+
+        return left + right[::-1]
 
     @staticmethod
     def __validate_params(tasks: list[StagedTask]) -> None:
